@@ -52,3 +52,8 @@ See `docs/adr/` for the reasoning behind the non-obvious stack choices.
 - [ ] Hosting target: AWS vs Azure
 - Survey versioning: Survey is locked while any Inspection against it is in progress (see ADR-0004)
 - Offline conflict resolution: in-progress Inspections are locked from Admin edits (see ADR-0005)
+
+
+## AI Workflow
+- you never commit code, you always ask user to commmit code
+- you ask me any time you are not 100% clear.
