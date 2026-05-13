@@ -1,0 +1,3 @@
+# Row-Level Tenant Isolation over Schema-Per-Tenant
+
+We use a single PostgreSQL schema with a `tenant_id` column on every tenant-scoped table, enforced via row-level security (RLS), rather than a separate schema or database per tenant. Schema-per-tenant is common in SaaS but adds significant operational overhead: migrations must run across every tenant schema, connection pooling is harder, and tooling complexity grows with tenant count. At this scale, RLS gives sufficient isolation with far simpler operations. If a tenant ever requires dedicated infrastructure (e.g., for their own compliance requirements), that can be addressed individually.
