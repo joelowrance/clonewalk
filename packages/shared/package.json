@@ -1,0 +1,25 @@
+{
+  "name": "@compliance/shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=6.0.0"
+  }
+}

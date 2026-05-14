@@ -1,0 +1,21 @@
+{
+  "name": "@compliance/root",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.1.1",
+  "scripts": {
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "dev:admin": "pnpm --filter @compliance/admin dev",
+    "dev:field": "pnpm --filter @compliance/field start",
+    "check:boundaries": "node scripts/check-boundaries.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "typescript": "^6.0.3"
+  }
+}

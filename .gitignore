@@ -1,1 +1,25 @@
 .claude/settings.local.json
+
+# Dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+*.tsbuildinfo
+
+# Next.js
+.next/
+out/
+
+# Expo / React Native
+.expo/
+android/
+ios/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor
+.DS_Store
