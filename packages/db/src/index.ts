@@ -1,1 +1,2 @@
-export const DB_PLACEHOLDER = 'db-not-yet-implemented' as const;
+export { db } from './client.js'
+export * as schema from './schema/index.js'

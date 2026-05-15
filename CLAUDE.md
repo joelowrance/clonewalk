@@ -54,6 +54,17 @@ See `docs/adr/` for the reasoning behind the non-obvious stack choices.
 - Offline conflict resolution: in-progress Inspections are locked from Admin edits (see ADR-0005)
 
 
+## Dev setup
+
+1. `cp .env.example .env`211
+2. `docker compose up -d` — starts Postgres on localhost:5432
+3. `pnpm install`
+4. `pnpm db:migrate` — applies migrations
+5. `pnpm dev:admin` / `pnpm dev:field` — starts apps
+
 ## AI Workflow
-- you never commit code, you always ask user to commmit code
+- you never commit code without being asked.
 - you ask me any time you are not 100% clear.
+- As you work through specs and tickets, you will update checkboxes to show them as done.
+- As each feature is completed, run all static checks and update the checklist. If any checks fail, fix them before proceeding.
+- As each ticket is completed, provide testing instructions in the ticket.

@@ -16,7 +16,7 @@ out/
 android/
 ios/
 
-# Environment variables
+# Environment variables (check in .env.example, not .env)
 .env
 .env.local
 .env.*.local

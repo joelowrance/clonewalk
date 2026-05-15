@@ -6,11 +6,11 @@ Set up the local development environment. Provide a Docker Compose file that sta
 
 ## Acceptance criteria
 
-- [ ] `docker-compose.yml` starts Postgres with a named dev database
-- [ ] Migration tool is configured in `packages/db`
-- [ ] `db:migrate` script runs from the repo root and applies migrations against the local dev DB
-- [ ] First migration runs without error (even if it creates nothing yet)
-- [ ] README or CLAUDE.md updated with dev setup instructions
+- [x] `docker-compose.yml` starts Postgres with a named dev database
+- [x] Migration tool is configured in `packages/db`
+- [x] `db:migrate` script runs from the repo root and applies migrations against the local dev DB
+- [x] First migration runs without error (even if it creates nothing yet)
+- [x] README or CLAUDE.md updated with dev setup instructions
 
 ## Blocked by
 

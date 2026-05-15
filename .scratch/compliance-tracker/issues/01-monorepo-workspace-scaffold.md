@@ -6,11 +6,11 @@ Set up the monorepo workspace that all future work will live in. Create the top-
 
 ## Acceptance criteria
 
-- [ ] Workspace root has a package manager config (e.g. pnpm workspaces) linking all packages
-- [ ] `apps/admin`, `apps/field`, `packages/db`, `packages/shared` directories exist with placeholder `package.json` files
-- [ ] Shared `tsconfig.base.json` is extended by each package
-- [ ] Linting runs across all packages from the root
-- [ ] CI runs lint and type-check on push
+- [x] Workspace root has a package manager config (e.g. pnpm workspaces) linking all packages
+- [x] `apps/admin`, `apps/field`, `packages/db`, `packages/shared` directories exist with placeholder `package.json` files
+- [x] Shared `tsconfig.base.json` is extended by each package
+- [x] Linting runs across all packages from the root
+- [x] CI runs lint and type-check on push
 
 ## Blocked by
 
