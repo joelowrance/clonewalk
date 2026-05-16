@@ -1,12 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2022"],
     "jsx": "react-native",
+    "lib": ["esnext"],
+    "types": ["jest"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@compliance/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "include": ["src", "app.json"],
-  "exclude": ["node_modules"]
+  "include": ["app", "src", "app.config.ts"]
 }
