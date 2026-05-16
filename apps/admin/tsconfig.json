@@ -5,7 +5,9 @@
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@compliance/shared": ["../../packages/shared/src/index.ts"],
+      "@compliance/db": ["../../packages/db/src/index.ts"]
     }
   },
   "include": ["src", "next.config.ts", ".next/types/**/*.ts"],

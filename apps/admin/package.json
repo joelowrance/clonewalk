@@ -7,7 +7,10 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@compliance/shared": "workspace:*",
@@ -16,9 +19,14 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/react": "^8.6.12",
+    "@storybook/react-vite": "^8.6.12",
     "@types/node": "^25.7.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "eslint-config-next": "16.2.6"
+    "eslint-config-next": "16.2.6",
+    "storybook": "^8.6.12"
   }
 }

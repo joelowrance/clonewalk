@@ -1,7 +1,9 @@
-export default function HomePage() {
+import { AppLayout } from '@/components/AppLayout'
+
+export default function DashboardPage() {
   return (
-    <main>
-      <h1>Compliance Admin</h1>
-    </main>
-  );
+    <AppLayout>
+      <h1>Welcome</h1>
+    </AppLayout>
+  )
 }

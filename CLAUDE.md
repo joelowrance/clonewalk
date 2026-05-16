@@ -47,6 +47,10 @@ See [AGENTS.md](./AGENTS.md) for rules governing AI agent behavior in this codeb
 
 See `docs/adr/` for the reasoning behind the non-obvious stack choices.
 
+## Frontend styling
+
+**Admin Web App:** CSS Modules (Next.js built-in, no additional dependencies). One `.module.css` file per component.
+
 ## Open decisions
 
 - [ ] Hosting target: AWS vs Azure

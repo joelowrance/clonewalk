@@ -21,5 +21,9 @@ ios/
 .env.local
 .env.*.local
 
+# Playwright
+playwright-report/
+test-results/
+
 # Editor
 .DS_Store

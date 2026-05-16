@@ -6,10 +6,10 @@ Scaffold the Admin Web App as a Next.js application inside `apps/admin`. It shou
 
 ## Acceptance criteria
 
-- [ ] `apps/admin` runs with `next dev` and serves a page at `/`
-- [ ] Basic layout component with nav shell renders
-- [ ] TypeScript compiles without errors
-- [ ] Linting passes
+- [x] `apps/admin` runs with `next dev` and serves a page at `/`
+- [x] Basic layout component with nav shell renders
+- [x] TypeScript compiles without errors
+- [x] Linting passes
 
 ## Blocked by
 
