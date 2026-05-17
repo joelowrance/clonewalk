@@ -1,3 +1,7 @@
 export * from './tenants.js'
 export * from './users.js'
 export * from './sessions.js'
+export * from './roles.js'
+export * from './role-permissions.js'
+export * from './user-role-assignments.js'
+export * from './user-permission-overrides.js'
