@@ -1,1 +1,2 @@
-// Schema files go here — one file per domain entity (e.g. tenants.ts, users.ts).
+export * from './tenants.js'
+export * from './users.js'

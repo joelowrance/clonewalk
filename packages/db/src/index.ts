@@ -1,2 +1,4 @@
 export { db } from './client.js'
 export * as schema from './schema/index.js'
+export { withTenant } from './rls.js'
+export type { Tx } from './rls.js'
