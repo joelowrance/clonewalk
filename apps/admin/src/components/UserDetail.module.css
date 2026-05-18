@@ -1,0 +1,153 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 600px;
+}
+
+.userHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.email {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.status[data-status='active'] {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status[data-status='pending'] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.checkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.fieldError {
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin: 0;
+}
+
+.saveBtn {
+  align-self: flex-start;
+  padding: 0.4rem 1rem;
+  background: #1e293b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #334155;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.overrideTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.overrideRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.permName {
+  font-size: 0.875rem;
+  color: #334155;
+  font-family: monospace;
+}
+
+.overrideSelect {
+  font-size: 0.875rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #1e293b;
+  background: #fff;
+}
+
+.permList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.permItem {
+  font-size: 0.875rem;
+  color: #1e293b;
+  font-family: monospace;
+  padding: 0.2rem 0;
+}
+
+.loading {
+  color: #64748b;
+  font-size: 0.875rem;
+}

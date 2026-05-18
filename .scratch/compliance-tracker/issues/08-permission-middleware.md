@@ -6,11 +6,11 @@ Add API middleware that resolves and enforces permissions on every protected rou
 
 ## Acceptance criteria
 
-- [ ] Middleware resolves effective permissions for the authenticated user on each request
-- [ ] A helper (e.g. `requirePermission('manage:locations')`) can be composed onto any API route
-- [ ] Requests lacking the required permission receive a `403` response
-- [ ] Unauthenticated requests are rejected before permission resolution
-- [ ] At least one protected route uses the middleware in a test that verifies allowed and denied cases
+- [x] Middleware resolves effective permissions for the authenticated user on each request
+- [x] A helper (e.g. `requirePermission('manage:locations')`) can be composed onto any API route
+- [x] Requests lacking the required permission receive a `403` response
+- [x] Unauthenticated requests are rejected before permission resolution
+- [x] At least one protected route uses the middleware in a test that verifies allowed and denied cases
 
 ## Blocked by
 
