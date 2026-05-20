@@ -22,6 +22,20 @@
       "when": 1779052257300,
       "tag": "0002_bright_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779146685554,
+      "tag": "0004_brief_robin_chapel",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779235777479,
+      "tag": "0004_damp_fenris",
+      "breakpoints": true
     }
   ]
 }

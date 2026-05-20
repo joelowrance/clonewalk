@@ -1,0 +1,1 @@
+ALTER TABLE "locations" ADD CONSTRAINT "locations_tenant_name_idx" UNIQUE("tenant_id","name");

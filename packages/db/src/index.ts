@@ -7,3 +7,5 @@ export { listRoles, createRole, updateRole, deleteRole } from './roles-queries.j
 export type { RoleWithDetails } from './roles-queries.js'
 export { listUsers, getUserDetail, setUserRoles, setUserOverrides } from './users-queries.js'
 export type { UserWithRoles, UserDetail } from './users-queries.js'
+export { listLocations, getLocation, createLocation, updateLocation, deleteLocation } from './locations-queries.js'
+export type { LocationRow } from './locations-queries.js'
