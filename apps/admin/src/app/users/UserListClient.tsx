@@ -38,6 +38,7 @@ export function UserListClient() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Users</h1>
+        <Link href="/users/invite" className={styles.inviteButton}>Invite User</Link>
       </div>
 
       {users.length === 0 ? (

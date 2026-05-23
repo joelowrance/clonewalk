@@ -9,3 +9,4 @@ export { listUsers, getUserDetail, setUserRoles, setUserOverrides } from './user
 export type { UserWithRoles, UserDetail } from './users-queries'
 export { listLocations, getLocation, createLocation, updateLocation, deleteLocation } from './locations-queries'
 export type { LocationRow } from './locations-queries'
+export { createInviteToken, getInviteToken, getRawInviteToken, consumeInviteToken } from './invite-queries'

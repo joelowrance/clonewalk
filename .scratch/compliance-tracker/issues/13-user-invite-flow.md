@@ -6,12 +6,12 @@ Allow a Tenant Admin to invite new users to their tenant by email. The invited u
 
 ## Acceptance criteria
 
-- [ ] `/users/invite` form accepts an email address
-- [ ] Submitting creates a pending user record and sends an invitation email
-- [ ] The invitation link is time-limited and single-use
-- [ ] The invited user can set their password via the invite link and is then logged in
-- [ ] `/users` lists all users (active and pending) for the tenant
-- [ ] Pending users are visually distinguished from active users
+- [x] `/users/invite` form accepts an email address
+- [x] Submitting creates a pending user record and sends an invitation email
+- [x] The invitation link is time-limited and single-use
+- [x] The invited user can set their password via the invite link and is then logged in
+- [x] `/users` lists all users (active and pending) for the tenant
+- [x] Pending users are visually distinguished from active users
 
 ## Blocked by
 

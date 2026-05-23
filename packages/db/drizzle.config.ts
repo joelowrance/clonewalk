@@ -1,4 +1,9 @@
+import { config } from 'dotenv'
+import { resolve } from 'path'
+import { fileURLToPath } from 'url'
 import type { Config } from 'drizzle-kit'
+
+config({ path: resolve(fileURLToPath(import.meta.url), '../../..', '.env') })
 
 export default {
   dialect: 'postgresql',
