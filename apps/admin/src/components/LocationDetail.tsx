@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './LocationDetail.module.css'
 
@@ -15,9 +16,11 @@ interface Props {
 }
 
 export function LocationDetail({ locationId }: Props) {
+  const router = useRouter()
   const [location, setLocation] = useState<Location | null>(null)
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetch(`/api/locations/${locationId}`)
@@ -30,6 +33,23 @@ export function LocationDetail({ locationId }: Props) {
       .finally(() => setLoading(false))
   }, [locationId])
 
+  async function handleDelete() {
+    if (!window.confirm('Delete this location? This cannot be undone.')) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/locations/${locationId}`, { method: 'DELETE' })
+      if (res.ok) {
+        router.push('/locations')
+      } else {
+        setError('Failed to delete location')
+        setDeleting(false)
+      }
+    } catch {
+      setError('Failed to delete location')
+      setDeleting(false)
+    }
+  }
+
   if (loading) return <p className={styles.empty}>Loading…</p>
   if (error || !location) return <p className={styles.empty}>{error ?? 'Location not found'}</p>
 
@@ -41,6 +61,12 @@ export function LocationDetail({ locationId }: Props) {
         <p className={styles.meta}>
           Created: {new Date(location.createdAt).toLocaleDateString()}
         </p>
+        <div className={styles.actions}>
+          <Link href={`/locations/${locationId}/edit`} className={styles.editLink}>Edit</Link>
+          <button onClick={handleDelete} disabled={deleting} className={styles.deleteButton}>
+            {deleting ? 'Deleting…' : 'Delete'}
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -56,6 +56,21 @@
   text-decoration: underline;
 }
 
+.newButton {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: #1e293b;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.newButton:hover {
+  background: #334155;
+}
+
 .empty {
   color: #64748b;
   font-size: 0.875rem;

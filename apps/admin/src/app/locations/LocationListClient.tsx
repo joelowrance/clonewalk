@@ -37,6 +37,7 @@ export function LocationListClient() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Locations</h1>
+        <Link href="/locations/new" className={styles.newButton}>New location</Link>
       </div>
 
       {locations.length === 0 ? (

@@ -74,4 +74,97 @@ test.describe.serial('Locations', () => {
     await expect(page).toHaveURL(`/locations/${E2E_LOC_A_ID}`)
     await expect(page.locator('h1')).toContainText('Warehouse A')
   })
+
+  test('"New location" link on the list page navigates to /locations/new', async ({ page }) => {
+    await login(page)
+    await page.goto('/locations')
+
+    await page.click('a:has-text("New location")')
+    await expect(page).toHaveURL('/locations/new')
+  })
+
+  test('/locations/new renders a form with a Location name field', async ({ page }) => {
+    await login(page)
+    await page.goto('/locations/new')
+
+    await expect(page.locator('h1')).toContainText('New location')
+    await expect(page.locator('input[type="text"]')).toBeVisible()
+  })
+
+  test('submitting the new location form creates the Location and redirects to its detail page', async ({ page }) => {
+    await login(page)
+    await page.goto('/locations/new')
+
+    await page.fill('input[type="text"]', 'Northside Clinic')
+    await page.click('button[type="submit"]')
+
+    await expect(page).toHaveURL(/\/locations\/[^/]+$/)
+    await expect(page.locator('h1')).toContainText('Northside Clinic')
+  })
+
+  test('/locations/[id]/edit renders a pre-filled form with the Location name', async ({ page }) => {
+    await db.insert(schema.locations)
+      .values({ id: E2E_LOC_A_ID, tenantId: E2E_TENANT_ID, name: 'Warehouse A' })
+      .onConflictDoNothing()
+
+    await login(page)
+    await page.goto(`/locations/${E2E_LOC_A_ID}/edit`)
+
+    await expect(page.locator('h1')).toContainText('Edit location')
+    await expect(page.locator('input[type="text"]')).toHaveValue('Warehouse A')
+  })
+
+  test('submitting the edit form saves the new name and redirects to the detail page', async ({ page }) => {
+    await db.insert(schema.locations)
+      .values({ id: E2E_LOC_A_ID, tenantId: E2E_TENANT_ID, name: 'Warehouse A' })
+      .onConflictDoNothing()
+
+    await login(page)
+    await page.goto(`/locations/${E2E_LOC_A_ID}/edit`)
+
+    await page.fill('input[type="text"]', 'Warehouse A Renamed')
+    await page.click('button[type="submit"]')
+
+    await expect(page).toHaveURL(`/locations/${E2E_LOC_A_ID}`)
+    await expect(page.locator('h1')).toContainText('Warehouse A Renamed')
+  })
+
+  test('Delete button on the detail page removes the Location after confirmation', async ({ page }) => {
+    await db.insert(schema.locations)
+      .values({ id: E2E_LOC_A_ID, tenantId: E2E_TENANT_ID, name: 'Warehouse A' })
+      .onConflictDoNothing()
+
+    await login(page)
+    await page.goto(`/locations/${E2E_LOC_A_ID}`)
+
+    page.on('dialog', (dialog) => dialog.accept())
+    await page.click('button:has-text("Delete")')
+
+    await expect(page).toHaveURL('/locations')
+  })
+
+  test('submitting a duplicate Location name shows an inline conflict error', async ({ page }) => {
+    await db.insert(schema.locations)
+      .values({ id: E2E_LOC_A_ID, tenantId: E2E_TENANT_ID, name: 'Warehouse A' })
+      .onConflictDoNothing()
+
+    await login(page)
+    await page.goto('/locations/new')
+
+    await page.fill('input[type="text"]', 'Warehouse A')
+    await page.click('button[type="submit"]')
+
+    await expect(page).toHaveURL('/locations/new')
+    await expect(page.getByText('A location with this name already exists')).toBeVisible()
+  })
+
+  test('submitting the new location form with an empty name shows an inline error', async ({ page }) => {
+    await login(page)
+    await page.goto('/locations/new')
+
+    await page.click('button[type="submit"]')
+
+    await expect(page).toHaveURL('/locations/new')
+    await expect(page.getByText('Name is required')).toBeVisible()
+  })
 })
