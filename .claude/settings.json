@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(DATABASE_URL=postgresql://compliance:compliance@localhost:5432/compliance_dev npx playwright test e2e/roles.spec.ts --timeout 60000)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('scripts',{}\\), indent=2\\)\\)\")",
+      "Bash(DATABASE_URL=postgresql://compliance:compliance@localhost:5432/compliance_dev npx next dev --no-turbopack)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"e2e@example.com\",\"password\":\"TestPassword1!\"}' -w '\\\\nHTTP_STATUS:%{http_code}')",
+      "Bash(cat /tmp/nextjs-webpack.log 2>&1)",
+      "Read(//tmp/**)",
+      "Bash(npx next *)",
+      "Bash(grep -E \"\\(^[^/]*$|/[^/]*$|packages\\)\")",
+      "Bash(pnpm --filter @compliance/db db:generate)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose src/__tests__/users.integration.test.ts 2>&1 | Select-Object -Last 30)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose src/__tests__/invite.integration.test.ts 2>&1 | Select-Object -Last 20)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose src/__tests__/invite.integration.test.ts 2>&1 | Select-Object -Last 15)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose src/__tests__/invite.integration.test.ts 2>&1 | Select-Object -Last 12)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose src/__tests__/invite.integration.test.ts 2>&1 | Select-Object -Last 18)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm typecheck 2>&1)",
+      "PowerShell($env:DATABASE_URL = \"postgresql://compliance:compliance@localhost:5432/compliance_dev\"; cd d:\\\\dev\\\\compliance\\\\apps\\\\admin; pnpm test -- --reporter=verbose 2>&1 | Select-Object -Last 35)",
+      "Bash(git commit -m ' *)",
+      "Bash(docker compose *)",
+      "Bash(pnpm --filter @compliance/db migrate)",
+      "Bash(pnpm dev:admin)",
+      "Bash(findstr \":3000\")",
+      "Bash(psql postgresql://compliance:compliance@localhost:5432/compliance_dev -c \"SELECT t.name, u.email, u.status FROM users u JOIN tenants t ON t.id = u.tenant_id ORDER BY t.name, u.email;\")",
+      "Bash(docker exec *)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"email\\\\\":\\\\\"admin@demo.com\\\\\",\\\\\"password\\\\\":\\\\\"Admin1234!\\\\\"}\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr \"LISTENING\")",
+      "Bash(taskkill /PID 31076 /F)",
+      "PowerShell(Stop-Process -Id 31076 -Force)",
+      "Bash(pnpm dev:admin > /tmp/admin-dev.log 2>&1 &)",
+      "Bash(python -m json.tool)",
+      "PowerShell($p = Start-Process -FilePath \"cmd.exe\" -ArgumentList \"/c pnpm dev:admin\" -WorkingDirectory \"d:\\\\dev\\\\compliance\" -WindowStyle Minimized -PassThru; Start-Sleep 5; $p.Id)",
+      "Bash(grep -E \"\\\\.\\(env|yml|yaml|json\\)$\")",
+      "Bash(pnpm --filter @compliance/admin exec vitest run src/__tests__/email.integration.test.ts)",
+      "Bash(node -e \"process.loadEnvFile\\('./apps/admin/.env'\\); console.log\\(process.env.SMTP_URL\\)\")",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\dev\\\\compliance\\\\apps\\\\admin\\\\src\\\\app\\\\\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"d:\\\\dev\\\\compliance\\\\apps\\\\admin\\\\src\\\\app\\\\\"\\), \"\" })",
+      "Read(//d/dev/compliance/**)",
+      "Bash(cp \"C:\\\\Users\\\\joelo\\\\.claude\\\\plans\\\\ok-in-the-docs-design-kind-stallman.md\" \"d:\\\\dev\\\\compliance\\\\docs\\\\design\\\\ui-redesign-plan.md\")",
+      "Bash(git checkout *)"
+    ],
+    "additionalDirectories": [
+      "d:\\dev\\compliance\\apps\\admin\\src\\app\\api\\invite",
+      "\\tmp",
+      "d:\\dev\\compliance\\docs\\design"
+    ]
+  }
+}
