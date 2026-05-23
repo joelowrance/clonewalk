@@ -19,6 +19,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <nav>
             <Link href="/roles" className={styles.navLink}>Roles</Link>
             <Link href="/users" className={styles.navLink}>Users</Link>
+            <Link href="/locations" className={styles.navLink}>Locations</Link>
           </nav>
         </aside>
         <main className={styles.content}>{children}</main>

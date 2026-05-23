@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, boolean, timestamp, primaryKey } from 'drizzle-orm/pg-core'
-import { users } from './users.js'
+import { users } from './users'
 
 export const userPermissionOverrides = pgTable('user_permission_overrides', {
   userId:     uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),

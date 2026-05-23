@@ -14,5 +14,6 @@ export default defineConfig({
     pool: 'forks',
     fileParallelism: false,
     setupFiles: ['./src/__tests__/setup.ts'],
+    exclude: ['**/node_modules/**', '**/e2e/**'],
   },
 })

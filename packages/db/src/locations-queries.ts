@@ -1,6 +1,6 @@
 import { eq, and, not } from 'drizzle-orm'
-import { withTenant } from './rls.js'
-import { locations } from './schema/index.js'
+import { withTenant } from './rls'
+import { locations } from './schema/index'
 
 export interface LocationRow {
   id:        string

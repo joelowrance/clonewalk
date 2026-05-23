@@ -1,6 +1,6 @@
 import { eq, inArray } from 'drizzle-orm'
-import { withTenant } from './rls.js'
-import { users, roles, rolePermissions, userRoleAssignments, userPermissionOverrides } from './schema/index.js'
+import { withTenant } from './rls'
+import { users, roles, rolePermissions, userRoleAssignments, userPermissionOverrides } from './schema/index'
 
 export interface UserWithRoles {
   id:     string

@@ -30,8 +30,10 @@ test('Tenant Admin can edit a role\'s name and permissions', async ({ page }) =>
   await login(page)
   await page.goto('/roles')
 
-  await page.click('a:has-text("Edit") >> nth=0')
-  await expect(page.url()).toMatch(/\/roles\/.+$/)
+  // Edit the "Inspector" role created in the previous test
+  const inspectorRow = page.locator('tr', { hasText: 'Inspector' })
+  await inspectorRow.locator('a:has-text("Edit")').click()
+  await expect(page).toHaveURL(/\/roles\/.+$/)
 
   const nameInput = page.locator('input#role-name')
   await nameInput.fill('')
@@ -50,7 +52,7 @@ test('Attempting to delete a role assigned to a user shows a blocking error mess
   const row = page.locator('tr', { hasText: 'E2E Admin' })
   await row.locator('button:has-text("Delete")').click()
 
-  await expect(page.locator('[role="alert"]')).toContainText('Remove all users from this role before deleting')
+  await expect(page.locator('[role="alert"]:not([id])')).toContainText('Remove all users from this role before deleting')
 })
 
 test('Tenant Admin can open a user\'s detail page, change their role, and see effective permissions update', async ({ page }) => {
@@ -60,7 +62,7 @@ test('Tenant Admin can open a user\'s detail page, change their role, and see ef
 
   const targetRow = page.locator('tr', { hasText: E2E_TARGET_USER_EMAIL })
   await targetRow.locator('a').click()
-  await expect(page.url()).toMatch(/\/users\/.+$/)
+  await expect(page).toHaveURL(/\/users\/.+$/)
 
   // Check the E2E Admin role for the target user
   const roleCheckbox = page.locator('label', { hasText: 'E2E Admin' }).locator('input[type="checkbox"]')
@@ -105,5 +107,5 @@ test('Attempting to remove manage:users from the currently logged-in Admin is re
   await roleCheckbox.uncheck()
   await page.click('button:has-text("Save roles")')
 
-  await expect(page.locator('[role="alert"]')).toContainText('manage:users')
+  await expect(page.locator('[role="alert"]:not([id])')).toContainText('manage:users')
 })

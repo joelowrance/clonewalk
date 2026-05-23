@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, primaryKey } from 'drizzle-orm/pg-core'
-import { roles } from './roles.js'
+import { roles } from './roles'
 
 export const rolePermissions = pgTable('role_permissions', {
   roleId:     uuid('role_id').notNull().references(() => roles.id, { onDelete: 'cascade' }),

@@ -12,7 +12,7 @@ test('valid login redirects to dashboard', async ({ page }) => {
   await page.fill('input[type="password"]', E2E_USER_PASSWORD)
   await page.click('button[type="submit"]')
   await expect(page).toHaveURL('/')
-  await expect(page.locator('nav')).toContainText('Compliance Tracker')
+  await expect(page.locator('nav').first()).toContainText('Compliance Tracker')
 })
 
 test('invalid login shows inline error', async ({ page }) => {

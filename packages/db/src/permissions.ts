@@ -1,6 +1,6 @@
 import { eq, inArray } from 'drizzle-orm'
-import { db } from './client.js'
-import { rolePermissions, userPermissionOverrides, userRoleAssignments } from './schema/index.js'
+import { db } from './client'
+import { rolePermissions, userPermissionOverrides, userRoleAssignments } from './schema/index'
 
 export async function resolvePermissions(userId: string): Promise<Set<string>> {
   const assignments = await db

@@ -1,6 +1,6 @@
 import { pgTable, uuid, timestamp, primaryKey } from 'drizzle-orm/pg-core'
-import { users } from './users.js'
-import { roles } from './roles.js'
+import { users } from './users'
+import { roles } from './roles'
 
 export const userRoleAssignments = pgTable('user_role_assignments', {
   userId:     uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),

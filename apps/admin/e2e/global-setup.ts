@@ -15,17 +15,22 @@ const E2E_TARGET_USER_ID = 'e2e00000-0000-0000-0000-000000000004'
 export default async function globalSetup() {
   const hashedPassword = await bcrypt.hash(E2E_USER_PASSWORD, 12)
 
-  // Clean up any leftover E2E data, then re-seed
-  await db.delete(schema.sessions).where(eq(schema.sessions.userId, E2E_USER_ID))
+  // Clean up all E2E tenant data, then re-seed
+  await db.delete(schema.sessions).where(eq(schema.sessions.tenantId, E2E_TENANT_ID))
+  await db.delete(schema.userPermissionOverrides).where(eq(schema.userPermissionOverrides.userId, E2E_TARGET_USER_ID))
   await db.delete(schema.userRoleAssignments).where(eq(schema.userRoleAssignments.userId, E2E_USER_ID))
+  await db.delete(schema.userRoleAssignments).where(eq(schema.userRoleAssignments.userId, E2E_TARGET_USER_ID))
   await db.delete(schema.users).where(eq(schema.users.id, E2E_TARGET_USER_ID))
   await db.delete(schema.users).where(eq(schema.users.id, E2E_USER_ID))
   await db.delete(schema.rolePermissions).where(eq(schema.rolePermissions.roleId, E2E_ROLE_ID))
-  await db.delete(schema.roles).where(eq(schema.roles.id, E2E_ROLE_ID))
+  await db.delete(schema.locations).where(eq(schema.locations.tenantId, E2E_TENANT_ID))
+  // Delete all roles for this tenant (including test-created ones like "Inspector")
+  await db.delete(schema.roles).where(eq(schema.roles.tenantId, E2E_TENANT_ID))
 
   await db.insert(schema.tenants).values({ id: E2E_TENANT_ID, name: 'E2E Tenant' }).onConflictDoNothing()
-  await db.insert(schema.roles).values({ id: E2E_ROLE_ID, tenantId: E2E_TENANT_ID, name: 'E2E Admin' }).onConflictDoNothing()
-  await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:users' }).onConflictDoNothing()
+  await db.insert(schema.roles).values({ id: E2E_ROLE_ID, tenantId: E2E_TENANT_ID, name: 'E2E Admin' })
+  await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:users' })
+  await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:locations' })
 
   await db.insert(schema.users).values({
     id:             E2E_USER_ID,

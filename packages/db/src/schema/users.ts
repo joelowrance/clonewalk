@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, pgEnum, unique } from 'drizzle-orm/pg-core'
-import { tenants } from './tenants.js'
+import { tenants } from './tenants'
 
 export const userStatusEnum = pgEnum('user_status', ['active', 'pending'])
 
