@@ -1,0 +1,41 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.cardHd {
+  padding: 14px var(--pad) 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cardHd h3 {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-left: auto;
+}
+
+.hdActions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.cardBody {
+  padding: var(--pad);
+}
+
+.flush {
+  padding: 0;
+}

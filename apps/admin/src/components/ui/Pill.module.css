@@ -1,0 +1,52 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  border: 1px solid var(--border);
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.good {
+  background: var(--good-soft);
+  color: var(--good);
+  border-color: color-mix(in oklab, var(--good), transparent 70%);
+}
+.good .dot { background: var(--good); }
+
+.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-color: color-mix(in oklab, var(--warn), transparent 70%);
+}
+.warn .dot { background: var(--warn); }
+
+.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border-color: color-mix(in oklab, var(--bad), transparent 70%);
+}
+.bad .dot { background: var(--bad); }
+
+.info {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border-color: color-mix(in oklab, var(--accent), transparent 75%);
+}
+.info .dot { background: var(--accent); }

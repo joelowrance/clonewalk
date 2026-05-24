@@ -1,0 +1,39 @@
+.pageHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.pageHead h1 {
+  font-size: 30px;
+}
+
+.crumbs {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.crumbs a {
+  color: var(--accent-ink);
+  cursor: pointer;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+}
+
+.sub {
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.pageActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
