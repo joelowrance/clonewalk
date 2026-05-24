@@ -1,0 +1,58 @@
+/* ─── tokens ─── */
+:root {
+  --bg: #f4efe5;
+  --surface: #fbf8f1;
+  --surface-2: #f0ead9;
+  --border: #e2d9c5;
+  --border-strong: #c9bea4;
+  --ink: #1a1814;
+  --ink-2: #4a443a;
+  --muted: #7a7160;
+  --faint: #a59c89;
+  --accent: #2c5fd6;
+  --accent-soft: #e6ecfb;
+  --accent-ink: #1c3f96;
+  --good: #2e7d50;
+  --good-soft: #dfeee3;
+  --warn: #b06b0c;
+  --warn-soft: #f6ebd4;
+  --bad: #b3372c;
+  --bad-soft: #f4dfd9;
+  --chrome: #1d2230;
+  --chrome-ink: #f5f1e8;
+  --chrome-ink-2: #aab1c2;
+
+  --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --serif: 'Newsreader', ui-serif, Georgia, serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+
+  --row-h: 40px;
+  --pad: 16px;
+  --pad-sm: 10px;
+  --r-sm: 4px;
+  --r: 6px;
+  --r-lg: 10px;
+
+  color-scheme: light;
+}
+
+/* ─── base ─── */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--serif); font-weight: 500; letter-spacing: -.01em; line-height: 1.15; }
+h1 { font-size: 28px; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; font-family: var(--sans); font-weight: 600; letter-spacing: .01em; }
