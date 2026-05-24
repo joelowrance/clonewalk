@@ -3,13 +3,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
+  background: var(--bg);
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 400px;
@@ -18,7 +18,8 @@
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1e293b;
+  font-family: var(--sans);
+  color: var(--ink);
   margin: 0 0 1.5rem;
 }
 
@@ -32,40 +33,51 @@
 .label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 .input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
   font-size: 0.875rem;
+  background: var(--bg);
+  color: var(--ink);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .input:focus {
-  border-color: #1e293b;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .error {
   font-size: 0.875rem;
-  color: #dc2626;
+  color: var(--bad);
+  background: var(--bad-soft);
+  border: 1px solid color-mix(in oklab, var(--bad), transparent 70%);
+  border-radius: var(--r);
+  padding: 6px 10px;
   margin: 0.5rem 0 1rem;
 }
 
 .submit {
   width: 100%;
   padding: 0.625rem;
-  background: #1e293b;
+  background: var(--accent);
+  border: 1px solid var(--accent);
   color: #fff;
-  border: none;
-  border-radius: 6px;
+  border-radius: var(--r);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   margin-top: 0.5rem;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
+}
+
+.submit:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent), #000 10%);
 }
 
 .submit:disabled {

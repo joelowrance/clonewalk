@@ -8,6 +8,7 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
+  font-family: var(--sans);
   color: #1e293b;
   margin: 0 0 0.25rem;
 }
