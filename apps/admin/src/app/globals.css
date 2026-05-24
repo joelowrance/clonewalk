@@ -22,9 +22,9 @@
   --chrome-ink: #f5f1e8;
   --chrome-ink-2: #aab1c2;
 
-  --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --serif: 'Newsreader', ui-serif, Georgia, serif;
-  --mono: 'Geist Mono', ui-monospace, monospace;
+  --sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --serif: var(--font-serif), ui-serif, Georgia, serif;
+  --mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --row-h: 40px;
   --pad: 16px;
