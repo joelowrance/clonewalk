@@ -1,123 +1,377 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+.btnPrimary {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
 }
 
-.header {
+.btnPrimary:hover {
+  background: color-mix(in oklab, var(--accent), #000 10%);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.cardHd {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  padding: 12px var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface), var(--bg) 30%);
 }
 
-.title {
-  font-size: 1.25rem;
+.cardHd h3 {
+  font-size: 13px;
   font-weight: 600;
-  color: #1e293b;
   margin: 0;
+  color: var(--ink);
 }
 
-.newButton {
-  display: inline-block;
-  padding: 0.4rem 1rem;
-  background: #1e293b;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
+.cardBody {
+  padding: var(--pad);
 }
 
-.newButton:hover {
-  background: #334155;
+.flush {
+  /* children control their own padding */
 }
 
-.deleteError {
-  font-size: 0.875rem;
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  margin: 0;
+.meta {
+  font-size: 11.5px;
+  color: var(--muted);
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
+/* Role list items */
+
+.roleItem,
+.roleItemActive {
+  padding: 12px var(--pad);
+  cursor: pointer;
+  transition: background .08s;
+  border-left: 3px solid transparent;
 }
 
-.th {
-  text-align: left;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #64748b;
+.roleItem:hover {
+  background: color-mix(in oklab, var(--surface), var(--accent) 4%);
 }
 
-.tr:hover {
-  background: #f8fafc;
+.roleItemActive {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
 }
 
-.td,
-.tdActions {
-  padding: 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
-  color: #1e293b;
-  vertical-align: middle;
-}
-
-.tdActions {
+.roleItemRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  justify-content: flex-end;
+  gap: 8px;
 }
 
-.link {
-  color: #1e293b;
-  text-decoration: none;
+.roleDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.roleMembers {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.rolePerms {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 3px;
+  padding-left: 16px;
+}
+
+/* Right panel */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.roleTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roleTitle h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnSm {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--r);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
+  font-size: 12px;
   font-weight: 500;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-.editLink {
-  color: #3b82f6;
-  text-decoration: none;
-  font-size: 0.875rem;
-}
-
-.editLink:hover {
-  text-decoration: underline;
-}
-
-.deleteButton {
-  background: none;
-  border: none;
-  color: #dc2626;
-  font-size: 0.875rem;
   cursor: pointer;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }
 
-.deleteButton:hover:not(:disabled) {
-  text-decoration: underline;
+.btnSm:hover {
+  background: color-mix(in oklab, var(--surface), var(--ink) 5%);
 }
 
-.deleteButton:disabled {
+.btnSmDanger {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--r);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--bad);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btnSmDanger:hover:not(:disabled) {
+  background: var(--bad-soft);
+}
+
+.btnSmDanger:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
+.deleteError {
+  font-size: 12px;
+  color: var(--bad);
+  background: var(--bad-soft);
+  border: 1px solid color-mix(in oklab, var(--bad), transparent 70%);
+  border-radius: var(--r);
+  padding: 6px 10px;
+  margin: 0 0 12px;
+}
+
+/* Stats row */
+
+.statsRow {
+  display: flex;
+  gap: 0;
+}
+
+.stat {
+  padding-right: 20px;
+  margin-right: 20px;
+  border-right: 1px solid var(--border);
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.statLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.statValue {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  margin-top: 4px;
+  color: var(--ink);
+}
+
+.statValueSm {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 6px;
+  color: var(--ink);
+}
+
+/* Permissions matrix */
+
+.matrixWrap {
+  overflow-x: auto;
+}
+
+.matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.matrix thead th {
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.matrix thead th:first-child {
+  text-align: left;
+  min-width: 180px;
+}
+
+.matrixColActive {
+  color: var(--accent) !important;
+}
+
+.matrix tbody td {
+  padding: 8px var(--pad);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.matrix tbody td:first-child {
+  text-align: left;
+}
+
+.matrix tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.permLabel {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.matrixCell {
+  /* inherits center from parent */
+}
+
+.tick {
+  color: var(--good);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.dash {
+  color: var(--faint);
+  font-size: 13px;
+}
+
+/* Members table */
+
+.memberTbl {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12.5px;
+}
+
+.memberTbl thead th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.memberTbl tbody td {
+  padding: 0 var(--pad);
+  height: var(--row-h);
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.memberTbl tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: hsl(var(--hue) 55% 88%);
+  color: hsl(var(--hue) 55% 28%);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Empty states */
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px var(--pad);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.emptyRight {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding-top: 40px;
+}
+
 .empty {
-  color: #64748b;
-  font-size: 0.875rem;
+  color: var(--muted);
+  font-size: 13px;
 }
