@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { PageHead } from '@/components/ui/PageHead'
+import { Pill } from '@/components/ui/Pill'
 import styles from './page.module.css'
 
 interface Location {
@@ -14,6 +17,8 @@ export function LocationListClient() {
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
+  const [q, setQ]                 = useState('')
+  const router = useRouter()
 
   const load = useCallback(async () => {
     try {
@@ -30,40 +35,67 @@ export function LocationListClient() {
 
   useEffect(() => { void load() }, [load])
 
+  const filtered = locations.filter(l =>
+    !q || l.name.toLowerCase().includes(q.toLowerCase())
+  )
+
   if (loading) return <p className={styles.empty}>Loading…</p>
   if (error)   return <p className={styles.empty}>{error}</p>
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Locations</h1>
-        <Link href="/locations/new" className={styles.newButton}>New location</Link>
-      </div>
+    <div>
+      <PageHead
+        title="Locations"
+        sub={`${locations.length} location${locations.length === 1 ? '' : 's'}`}
+        actions={
+          <Link href="/locations/new" className={styles.btnPrimary}>
+            + New location
+          </Link>
+        }
+      />
 
-      {locations.length === 0 ? (
-        <p className={styles.empty}>No locations yet.</p>
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th className={styles.th}>Name</th>
-              <th className={styles.th}>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {locations.map((loc) => (
-              <tr key={loc.id} className={styles.tr}>
-                <td className={styles.td}>
-                  <Link href={`/locations/${loc.id}`} className={styles.link}>{loc.name}</Link>
-                </td>
-                <td className={styles.td}>
-                  {new Date(loc.createdAt).toLocaleDateString()}
-                </td>
+      <div className={styles.card}>
+        <div className={styles.toolsRow}>
+          <div className={styles.search}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14">
+              <circle cx="7" cy="7" r="4.5"/><path d="m13.5 13.5-3-3"/>
+            </svg>
+            <input
+              placeholder="Search by name…"
+              value={q}
+              onChange={e => setQ(e.target.value)}
+            />
+          </div>
+          <span className={styles.count}>
+            {filtered.length} of {locations.length}
+          </span>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className={styles.emptyState}>
+            {q ? 'No locations match your search.' : 'No locations yet.'}
+          </div>
+        ) : (
+          <table className={styles.tbl}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {filtered.map(loc => (
+                <tr key={loc.id} onClick={() => router.push(`/locations/${loc.id}`)}>
+                  <td><strong>{loc.name}</strong></td>
+                  <td><Pill kind="info">Active</Pill></td>
+                  <td>{new Date(loc.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,77 +1,125 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+.btnPrimary {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.header {
+.btnPrimary:hover {
+  background: color-mix(in oklab, var(--accent), #000 10%);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.toolsRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 8px;
+  padding: 10px 12px 10px var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface), var(--bg) 30%);
 }
 
-.title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: 12.5px;
+  color: var(--ink);
+  min-width: 220px;
 }
 
-.table {
+.search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font: inherit;
+  color: inherit;
+}
+
+.search svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.count {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.tbl {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12.5px;
 }
 
-.th {
+.tbl thead th {
   text-align: left;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-  font-size: 0.75rem;
   font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #64748b;
+  color: var(--muted);
+  padding: 10px var(--pad);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
 }
 
-.tr:hover {
-  background: #f8fafc;
-}
-
-.td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
-  color: #1e293b;
+.tbl tbody td {
+  padding: 0 var(--pad);
+  height: var(--row-h);
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
   vertical-align: middle;
 }
 
-.link {
-  color: #1e293b;
-  text-decoration: none;
-  font-weight: 500;
+.tbl tbody tr:last-child td {
+  border-bottom: none;
 }
 
-.link:hover {
-  text-decoration: underline;
+.tbl tbody tr {
+  transition: background .08s;
+  cursor: pointer;
 }
 
-.newButton {
-  display: inline-block;
-  padding: 0.4rem 1rem;
-  background: #1e293b;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
+.tbl tbody tr:hover {
+  background: color-mix(in oklab, var(--surface), var(--accent) 4%);
 }
 
-.newButton:hover {
-  background: #334155;
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px var(--pad);
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .empty {
-  color: #64748b;
-  font-size: 0.875rem;
+  color: var(--muted);
+  font-size: 13px;
 }
