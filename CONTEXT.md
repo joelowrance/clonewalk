@@ -31,7 +31,7 @@ _Avoid_: Group, user type, access level
 ### Surveys
 
 **Survey**:
-The canonical set of Questions for an Industry, built by a Tenant Admin and applied consistently to every Location in that Industry. One Survey exists per Industry per Tenant — it is not copied per Location.
+A versioned set of Questions for an Industry, built by a Tenant Admin. Multiple Survey versions can exist per Industry per Tenant. The most recently created Survey is marked `is_current` and used for new Inspections. Older versions remain active for Locations grandfathered in at the time they scheduled their Inspection. A Survey is not copied per Location — the same Survey version is shared by all Locations using that version.
 _Avoid_: Form, checklist, assessment, audit, template
 
 **Inspection**:
@@ -87,13 +87,13 @@ _Avoid_: Sector, category, vertical
 ## Relationships
 
 - A **Tenant** has many **Locations**
-- A **Tenant** configures **Surveys** for specific **Industries**
-- A **Location** must complete one or more **Surveys** to receive **Certification**
+- A **Tenant** maintains one or more **Survey** versions per **Industry**; the current version (`is_current`) is used for new **Inspections**
+- A **Location** is grandfathered into the **Survey** version active at the time its **Inspection** was scheduled
 - A **Survey** contains an ordered list of **Questions**
 - A **Question** may contain nested sub-**Questions**
 - A **Question** may have **Branching Logic** that reveals or hides other **Questions**
 - A **Certification** may require sign-off from multiple people [TBD]
-- A **Survey** is applied to every **Location** in a given **Industry** within a **Tenant**
+- The current **Survey** version is used for any new **Inspection** in a given **Industry** within a **Tenant**
 - An **Inspection** groups one or more **Inspectors** visiting a **Location** on a given date; the required Inspector count is set by the Tenant Admin at scheduling time
 - Each **Inspector** produces one **Walkthrough** per **Inspection**
 - An **Inspection** requires **Finalization** by a Tenant Admin before **Certification** is granted or an **Incident** is opened
