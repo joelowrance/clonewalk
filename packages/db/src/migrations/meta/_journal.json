@@ -43,6 +43,13 @@
       "when": 1779562972555,
       "tag": "0005_burly_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779664876265,
+      "tag": "0006_graceful_moonstone",
+      "breakpoints": true
     }
   ]
 }

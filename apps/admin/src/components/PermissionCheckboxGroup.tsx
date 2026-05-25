@@ -7,6 +7,7 @@ import styles from './PermissionCheckboxGroup.module.css'
 const PERMISSION_LABELS: Record<Permission, string> = {
   'manage:users':          'Manage users',
   'manage:locations':      'Manage locations',
+  'manage:industries':     'Manage industries',
   'manage:surveys':        'Manage surveys',
   'manage:inspections':    'Manage inspections',
   'finalize:inspections':  'Finalize inspections',

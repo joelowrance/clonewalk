@@ -33,6 +33,12 @@ const PROGRAMS_NAV = [
     icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M8 1.5 13 4v4c0 3-2.2 5.5-5 6.5-2.8-1-5-3.5-5-6.5V4l5-2.5Z"/><path d="m5.8 8 1.6 1.6L10.5 6.5"/></svg>,
     match: (p: string) => p.startsWith('/roles'),
   },
+  {
+    href: '/industries',
+    label: 'Industries',
+    icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1.5" y="8.5" width="3" height="5.5"/><rect x="6.5" y="5.5" width="3" height="8.5"/><rect x="11.5" y="2.5" width="3" height="11.5"/><path d="M1.5 8.5 6.5 5.5 11.5 2.5" strokeLinecap="round"/></svg>,
+    match: (p: string) => p.startsWith('/industries'),
+  },
 ]
 
 function emailInitials(email: string): string {

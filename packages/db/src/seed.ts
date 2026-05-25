@@ -30,6 +30,7 @@ await db.insert(schema.rolePermissions)
   .values([
     { roleId: ROLE_ID, permission: 'manage:users' },
     { roleId: ROLE_ID, permission: 'manage:locations' },
+    { roleId: ROLE_ID, permission: 'manage:industries' },
     { roleId: ROLE_ID, permission: 'manage:surveys' },
     { roleId: ROLE_ID, permission: 'manage:inspections' },
     { roleId: ROLE_ID, permission: 'finalize:inspections' },
