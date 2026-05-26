@@ -17,7 +17,8 @@
     "generate": "drizzle-kit generate",
     "studio": "drizzle-kit studio",
     "test": "vitest run",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "reseed": "tsx src/reseed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

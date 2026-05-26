@@ -13,7 +13,8 @@
     "db:generate": "pnpm --filter @compliance/db generate",
     "db:studio": "pnpm --filter @compliance/db studio",
     "db:test": "pnpm --filter @compliance/db test",
-    "db:seed": "pnpm --filter @compliance/db seed"
+    "db:seed": "pnpm --filter @compliance/db seed",
+    "db:reseed": "pnpm --filter @compliance/db reseed"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.59.3",

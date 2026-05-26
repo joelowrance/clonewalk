@@ -39,6 +39,12 @@ const PROGRAMS_NAV = [
     icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1.5" y="8.5" width="3" height="5.5"/><rect x="6.5" y="5.5" width="3" height="8.5"/><rect x="11.5" y="2.5" width="3" height="11.5"/><path d="M1.5 8.5 6.5 5.5 11.5 2.5" strokeLinecap="round"/></svg>,
     match: (p: string) => p.startsWith('/industries'),
   },
+  {
+    href: '/surveys',
+    label: 'Surveys',
+    icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 5.5h6M5 8h6M5 10.5h4" strokeLinecap="round"/></svg>,
+    match: (p: string) => p.startsWith('/surveys'),
+  },
 ]
 
 function emailInitials(email: string): string {

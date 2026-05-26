@@ -16,6 +16,8 @@ export default async function globalSetup() {
   const hashedPassword = await bcrypt.hash(E2E_USER_PASSWORD, 12)
 
   // Clean up all E2E tenant data, then re-seed
+  await db.delete(schema.surveys).where(eq(schema.surveys.tenantId, E2E_TENANT_ID))
+  await db.delete(schema.tenantIndustries).where(eq(schema.tenantIndustries.tenantId, E2E_TENANT_ID))
   await db.delete(schema.sessions).where(eq(schema.sessions.tenantId, E2E_TENANT_ID))
   await db.delete(schema.userPermissionOverrides).where(eq(schema.userPermissionOverrides.userId, E2E_TARGET_USER_ID))
   await db.delete(schema.userRoleAssignments).where(eq(schema.userRoleAssignments.userId, E2E_USER_ID))
@@ -31,6 +33,7 @@ export default async function globalSetup() {
   await db.insert(schema.roles).values({ id: E2E_ROLE_ID, tenantId: E2E_TENANT_ID, name: 'E2E Admin' })
   await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:users' })
   await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:locations' })
+  await db.insert(schema.rolePermissions).values({ roleId: E2E_ROLE_ID, permission: 'manage:surveys' })
 
   await db.insert(schema.users).values({
     id:             E2E_USER_ID,
