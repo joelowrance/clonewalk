@@ -14,3 +14,5 @@ export { listIndustriesWithTenantStatus, enableIndustry, disableIndustry, isIndu
 export type { IndustryRow } from './industries-queries'
 export { listSurveys, getSurvey, createSurvey, updateSurvey, deleteSurvey } from './surveys-queries'
 export type { SurveyRow } from './surveys-queries'
+export { listQuestions, createQuestion, updateQuestion, deleteQuestion, reorderQuestions } from './questions-queries'
+export type { QuestionRow } from './questions-queries'

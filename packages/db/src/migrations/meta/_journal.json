@@ -57,6 +57,13 @@
       "when": 1779739554222,
       "tag": "0007_solid_gladiator",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779837056607,
+      "tag": "0008_simple_nekra",
+      "breakpoints": true
     }
   ]
 }
