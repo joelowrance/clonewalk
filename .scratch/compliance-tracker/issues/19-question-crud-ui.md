@@ -6,13 +6,13 @@ Build the flat Question management UI within the survey builder. A Tenant Admin 
 
 ## Acceptance criteria
 
-- [ ] `/surveys/[id]` (survey builder) lists Questions in order with their text, Answer Type, Point Value, and Critical flag
-- [ ] Admin can add a new Question (text, Answer Type, Point Value, Critical flag)
-- [ ] Admin can edit an existing Question inline or via a form
-- [ ] Admin can delete a Question (with confirmation)
-- [ ] Admin can reorder Questions via drag-and-drop or up/down controls
-- [ ] Answer Type selection is limited to: True/False, Scored, Multiple Choice, Photo, File
-- [ ] Reordering persists on page refresh
+- [x] `/surveys/[id]` (survey builder) lists Questions in order with their text, Answer Type, Point Value, and Critical flag
+- [x] Admin can add a new Question (text, Answer Type, Point Value, Critical flag)
+- [x] Admin can edit an existing Question inline or via a form
+- [x] Admin can delete a Question (with confirmation)
+- [x] Admin can reorder Questions via drag-and-drop or up/down controls
+- [x] Answer Type selection is limited to: True/False, Scored, Multiple Choice, Photo, File
+- [x] Reordering persists on page refresh
 
 ## Blocked by
 
