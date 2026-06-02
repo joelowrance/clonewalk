@@ -20,3 +20,16 @@ export const questions = pgTable('questions', {
 
 export type Question    = typeof questions.$inferSelect
 export type NewQuestion = typeof questions.$inferInsert
+
+export const questionOptions = pgTable('question_options', {
+  id:          uuid('id').primaryKey().defaultRandom(),
+  tenantId:    uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
+  questionId:  uuid('question_id').notNull().references(() => questions.id, { onDelete: 'cascade' }),
+  label:       text('label').notNull(),
+  pointValue:  integer('point_value').notNull().default(0),
+  position:    integer('position').notNull().default(0),
+  createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export type QuestionOption    = typeof questionOptions.$inferSelect
+export type NewQuestionOption = typeof questionOptions.$inferInsert

@@ -16,3 +16,5 @@ export { listSurveys, getSurvey, createSurvey, updateSurvey, deleteSurvey } from
 export type { SurveyRow } from './surveys-queries'
 export { listQuestions, createQuestion, updateQuestion, deleteQuestion, reorderQuestions } from './questions-queries'
 export type { QuestionRow } from './questions-queries'
+export { listQuestionOptions, createQuestionOption, updateQuestionOption, deleteQuestionOption, reorderQuestionOptions } from './question-options-queries'
+export type { QuestionOptionRow } from './question-options-queries'

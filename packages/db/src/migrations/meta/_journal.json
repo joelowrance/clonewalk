@@ -64,6 +64,13 @@
       "when": 1780165453710,
       "tag": "0008_broken_franklin_richards",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780390503996,
+      "tag": "0009_sturdy_talkback",
+      "breakpoints": true
     }
   ]
 }
