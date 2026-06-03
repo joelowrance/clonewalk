@@ -29,22 +29,26 @@ const ANSWER_TYPE_LABELS: Record<AnswerType, string> = {
 }
 
 interface Question {
-  id:          string
-  text:        string
-  answerType:  AnswerType
-  pointValue:  number
-  isCritical:  boolean
-  position:    number
+  id:              string
+  text:            string
+  answerType:      AnswerType
+  pointValue:      number
+  scoredMinValue:  number | null
+  scoredMaxValue:  number | null
+  isCritical:      boolean
+  position:        number
 }
 
 interface FormState {
-  text:        string
-  answerType:  AnswerType
-  pointValue:  string
-  isCritical:  boolean
+  text:            string
+  answerType:      AnswerType
+  pointValue:      string
+  scoredMinValue:  string
+  scoredMaxValue:  string
+  isCritical:      boolean
 }
 
-const EMPTY_FORM: FormState = { text: '', answerType: 'true_false', pointValue: '0', isCritical: false }
+const EMPTY_FORM: FormState = { text: '', answerType: 'true_false', pointValue: '0', scoredMinValue: '0', scoredMaxValue: '10', isCritical: false }
 
 function SortableRow({
   question,
@@ -85,6 +89,11 @@ function SortableRow({
       <td className={styles.textCell}>{question.text}</td>
       <td className={styles.cell}>{ANSWER_TYPE_LABELS[question.answerType]}</td>
       <td className={styles.cell}>{question.pointValue}</td>
+      <td className={styles.cell} data-testid="question-range">
+        {question.answerType === 'scored' && question.scoredMinValue !== null && question.scoredMaxValue !== null
+          ? `${question.scoredMinValue}–${question.scoredMaxValue}`
+          : '—'}
+      </td>
       <td className={styles.cell}>{question.isCritical ? 'Critical' : '—'}</td>
       <td className={styles.actionsCell}>
         <button className={styles.editBtn} onClick={() => onEdit(question)} type="button">Edit</button>
@@ -162,6 +171,35 @@ function QuestionFormModal({
             disabled={saving}
           />
         </div>
+
+        {form.answerType === 'scored' && (
+          <>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="q-min">Min value</label>
+              <input
+                id="q-min"
+                type="number"
+                className={styles.input}
+                data-testid="scored-min-input"
+                value={form.scoredMinValue}
+                onChange={e => set('scoredMinValue', e.target.value)}
+                disabled={saving}
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="q-max">Max value</label>
+              <input
+                id="q-max"
+                type="number"
+                className={styles.input}
+                data-testid="scored-max-input"
+                value={form.scoredMaxValue}
+                onChange={e => set('scoredMaxValue', e.target.value)}
+                disabled={saving}
+              />
+            </div>
+          </>
+        )}
 
         <div className={styles.checkRow}>
           <input
@@ -244,15 +282,20 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     if (!form.text.trim()) { setFormError('Question text is required'); return }
     setSaving(true)
     setFormError(null)
+    const body: Record<string, unknown> = {
+      text: form.text.trim(),
+      answerType: form.answerType,
+      pointValue: parseInt(form.pointValue, 10) || 0,
+      isCritical: form.isCritical,
+    }
+    if (form.answerType === 'scored') {
+      body['scoredMinValue'] = parseInt(form.scoredMinValue, 10)
+      body['scoredMaxValue'] = parseInt(form.scoredMaxValue, 10)
+    }
     const res = await fetch(`/api/surveys/${surveyId}/questions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        text: form.text.trim(),
-        answerType: form.answerType,
-        pointValue: parseInt(form.pointValue, 10) || 0,
-        isCritical: form.isCritical,
-      }),
+      body: JSON.stringify(body),
     })
     setSaving(false)
     if (res.ok) {
@@ -269,15 +312,20 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     if (!form.text.trim()) { setFormError('Question text is required'); return }
     setSaving(true)
     setFormError(null)
+    const body: Record<string, unknown> = {
+      text: form.text.trim(),
+      answerType: form.answerType,
+      pointValue: parseInt(form.pointValue, 10) || 0,
+      isCritical: form.isCritical,
+    }
+    if (form.answerType === 'scored') {
+      body['scoredMinValue'] = parseInt(form.scoredMinValue, 10)
+      body['scoredMaxValue'] = parseInt(form.scoredMaxValue, 10)
+    }
     const res = await fetch(`/api/surveys/${surveyId}/questions/${editTarget.id}`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        text: form.text.trim(),
-        answerType: form.answerType,
-        pointValue: parseInt(form.pointValue, 10) || 0,
-        isCritical: form.isCritical,
-      }),
+      body: JSON.stringify(body),
     })
     setSaving(false)
     if (res.ok) {
@@ -339,6 +387,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
                   <th className={styles.th}>Question</th>
                   <th className={styles.th}>Answer Type</th>
                   <th className={styles.th}>Points</th>
+                  <th className={styles.th}>Range</th>
                   <th className={styles.th}>Critical</th>
                   <th className={styles.th} />
                 </tr>
@@ -372,7 +421,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       {editTarget && (
         <QuestionFormModal
           title="Edit question"
-          initial={{ text: editTarget.text, answerType: editTarget.answerType, pointValue: String(editTarget.pointValue), isCritical: editTarget.isCritical }}
+          initial={{ text: editTarget.text, answerType: editTarget.answerType, pointValue: String(editTarget.pointValue), scoredMinValue: String(editTarget.scoredMinValue ?? 0), scoredMaxValue: String(editTarget.scoredMaxValue ?? 10), isCritical: editTarget.isCritical }}
           onSave={handleEdit}
           onCancel={() => setEditTarget(null)}
           saving={saving}

@@ -23,7 +23,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: 'validation_error' }, { status: 400 })
   }
   const raw = body as Record<string, unknown>
-  const data: { text?: string; answerType?: QuestionRow['answerType']; pointValue?: number; isCritical?: boolean } = {}
+  const data: { text?: string; answerType?: QuestionRow['answerType']; pointValue?: number; scoredMinValue?: number | null; scoredMaxValue?: number | null; isCritical?: boolean } = {}
 
   if (raw['text'] !== undefined) {
     if (typeof raw['text'] !== 'string' || raw['text'].trim().length === 0) {
@@ -46,13 +46,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (raw['isCritical'] !== undefined) {
     data.isCritical = raw['isCritical'] === true
   }
+  if (raw['scoredMinValue'] !== undefined || raw['scoredMaxValue'] !== undefined || data.answerType === 'scored') {
+    const min = raw['scoredMinValue']
+    const max = raw['scoredMaxValue']
+    if (typeof min !== 'number') {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMinValue: 'required for scored questions' } }, { status: 400 })
+    }
+    if (typeof max !== 'number') {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMaxValue: 'required for scored questions' } }, { status: 400 })
+    }
+    if (min >= max) {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMinValue: 'must be less than scoredMaxValue' } }, { status: 400 })
+    }
+    data.scoredMinValue = min
+    data.scoredMaxValue = max
+  }
 
   const result = await updateQuestion(ctx.tenantId, questionId, data)
   if ('error' in result) return NextResponse.json({ error: 'not_found' }, { status: 404 })
   const q = result.question
   return NextResponse.json({ question: {
     id: q.id, surveyId: q.surveyId, text: q.text, answerType: q.answerType,
-    pointValue: q.pointValue, isCritical: q.isCritical, position: q.position,
+    pointValue: q.pointValue, scoredMinValue: q.scoredMinValue, scoredMaxValue: q.scoredMaxValue,
+    isCritical: q.isCritical, position: q.position,
     createdAt: q.createdAt.toISOString(),
   }})
 }

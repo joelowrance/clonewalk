@@ -142,6 +142,62 @@ describe('POST /api/surveys/[id]/questions', () => {
     )
     expect(res.status).toBe(400)
   })
+
+  it('creates a scored question with min/max range', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Rate cleanliness', answerType: 'scored', pointValue: 10, isCritical: false, scoredMinValue: 0, scoredMaxValue: 10 }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(201)
+    const body = await res.json() as { question: { scoredMinValue: number; scoredMaxValue: number } }
+    expect(body.question.scoredMinValue).toBe(0)
+    expect(body.question.scoredMaxValue).toBe(10)
+  })
+
+  it('returns 400 when scored question is missing scoredMinValue', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Rate it', answerType: 'scored', pointValue: 5, isCritical: false, scoredMaxValue: 10 }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when scored question is missing scoredMaxValue', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Rate it', answerType: 'scored', pointValue: 5, isCritical: false, scoredMinValue: 0 }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when scoredMinValue >= scoredMaxValue', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Rate it', answerType: 'scored', pointValue: 5, isCritical: false, scoredMinValue: 10, scoredMaxValue: 5 }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(400)
+  })
+
+  it('creates a non-scored question without min/max range', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Is it clean?', answerType: 'true_false', pointValue: 5, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(201)
+    const body = await res.json() as { question: { scoredMinValue: unknown; scoredMaxValue: unknown } }
+    expect(body.question.scoredMinValue).toBeNull()
+    expect(body.question.scoredMaxValue).toBeNull()
+  })
 })
 
 describe('PATCH /api/surveys/[id]/questions/[questionId]', () => {
@@ -174,6 +230,26 @@ describe('PATCH /api/surveys/[id]/questions/[questionId]', () => {
       { params: Promise.resolve({ id: SURVEY_ID, questionId: '00000000-0000-0000-0000-000000000000' }) },
     )
     expect(res.status).toBe(404)
+  })
+
+  it('updates scored range on a question', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const { PATCH } = await import('../app/api/surveys/[id]/questions/[questionId]/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const createRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Rate it', answerType: 'scored', pointValue: 10, isCritical: false, scoredMinValue: 0, scoredMaxValue: 10 }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: created } = await createRes.json() as { question: { id: string } }
+
+    const res = await PATCH(
+      surveyReq('PATCH', sid, SURVEY_ID, `/${created.id}`, { scoredMinValue: 1, scoredMaxValue: 100 }),
+      { params: Promise.resolve({ id: SURVEY_ID, questionId: created.id }) },
+    )
+    expect(res.status).toBe(200)
+    const body = await res.json() as { question: { scoredMinValue: number; scoredMaxValue: number } }
+    expect(body.question.scoredMinValue).toBe(1)
+    expect(body.question.scoredMaxValue).toBe(100)
   })
 })
 

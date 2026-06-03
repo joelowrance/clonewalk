@@ -20,6 +20,8 @@ function serialize(q: QuestionRow) {
     text: q.text,
     answerType: q.answerType,
     pointValue: q.pointValue,
+    scoredMinValue: q.scoredMinValue,
+    scoredMaxValue: q.scoredMaxValue,
     isCritical: q.isCritical,
     position: q.position,
     createdAt: q.createdAt.toISOString(),
@@ -43,7 +45,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (typeof body !== 'object' || body === null) {
     return NextResponse.json({ error: 'validation_error' }, { status: 400 })
   }
-  const { text, answerType, pointValue, isCritical } = body as Record<string, unknown>
+  const { text, answerType, pointValue, isCritical, scoredMinValue, scoredMaxValue } = body as Record<string, unknown>
 
   if (typeof text !== 'string' || text.trim().length === 0) {
     return NextResponse.json({ error: 'validation_error', fields: { text: 'required' } }, { status: 400 })
@@ -51,12 +53,25 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!VALID_ANSWER_TYPES.includes(answerType as never)) {
     return NextResponse.json({ error: 'validation_error', fields: { answerType: 'must be one of: true_false, scored, multiple_choice, photo, file' } }, { status: 400 })
   }
+  if (answerType === 'scored') {
+    if (typeof scoredMinValue !== 'number') {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMinValue: 'required for scored questions' } }, { status: 400 })
+    }
+    if (typeof scoredMaxValue !== 'number') {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMaxValue: 'required for scored questions' } }, { status: 400 })
+    }
+    if (scoredMinValue >= scoredMaxValue) {
+      return NextResponse.json({ error: 'validation_error', fields: { scoredMinValue: 'must be less than scoredMaxValue' } }, { status: 400 })
+    }
+  }
 
   const result = await createQuestion(ctx.tenantId, {
     surveyId: id,
     text: text.trim(),
     answerType: answerType as QuestionRow['answerType'],
     pointValue: typeof pointValue === 'number' ? pointValue : 0,
+    scoredMinValue: answerType === 'scored' ? (scoredMinValue as number) : null,
+    scoredMaxValue: answerType === 'scored' ? (scoredMaxValue as number) : null,
     isCritical: isCritical === true,
   })
 

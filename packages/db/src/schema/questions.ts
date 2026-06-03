@@ -12,8 +12,11 @@ export const questions = pgTable('questions', {
   surveyId:    uuid('survey_id').notNull().references(() => surveys.id, { onDelete: 'cascade' }),
   text:        text('text').notNull(),
   answerType:  answerTypeEnum('answer_type').notNull(),
-  pointValue:  integer('point_value').notNull().default(0),
-  isCritical:  boolean('is_critical').notNull().default(false),
+  pointValue:      integer('point_value').notNull().default(0),
+  // Scored questions only. Formula: (entered_value - min) / (max - min) * point_value
+  scoredMinValue:  integer('scored_min_value'),
+  scoredMaxValue:  integer('scored_max_value'),
+  isCritical:      boolean('is_critical').notNull().default(false),
   position:    integer('position').notNull().default(0),
   createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })

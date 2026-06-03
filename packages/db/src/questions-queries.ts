@@ -4,20 +4,22 @@ import { withTenant } from './rls'
 import { questions, surveys } from './schema/index'
 
 export interface QuestionRow {
-  id:          string
-  tenantId:    string
-  surveyId:    string
-  text:        string
-  answerType:  'true_false' | 'scored' | 'multiple_choice' | 'photo' | 'file'
-  pointValue:  number
-  isCritical:  boolean
-  position:    number
-  createdAt:   Date
+  id:              string
+  tenantId:        string
+  surveyId:        string
+  text:            string
+  answerType:      'true_false' | 'scored' | 'multiple_choice' | 'photo' | 'file'
+  pointValue:      number
+  scoredMinValue:  number | null
+  scoredMaxValue:  number | null
+  isCritical:      boolean
+  position:        number
+  createdAt:       Date
 }
 
 export async function createQuestion(
   tenantId: string,
-  data: { surveyId: string; text: string; answerType: QuestionRow['answerType']; pointValue: number; isCritical: boolean },
+  data: { surveyId: string; text: string; answerType: QuestionRow['answerType']; pointValue: number; scoredMinValue?: number | null; scoredMaxValue?: number | null; isCritical: boolean },
 ): Promise<{ question: QuestionRow } | { error: 'survey_not_found' }> {
   const [survey] = await db.select({ id: surveys.id }).from(surveys).where(eq(surveys.id, data.surveyId))
   if (!survey) return { error: 'survey_not_found' }
@@ -31,7 +33,7 @@ export async function createQuestion(
 
     const [question] = await tx
       .insert(questions)
-      .values({ tenantId, surveyId: data.surveyId, text: data.text, answerType: data.answerType, pointValue: data.pointValue, isCritical: data.isCritical, position })
+      .values({ tenantId, surveyId: data.surveyId, text: data.text, answerType: data.answerType, pointValue: data.pointValue, scoredMinValue: data.scoredMinValue ?? null, scoredMaxValue: data.scoredMaxValue ?? null, isCritical: data.isCritical, position })
       .returning()
     return { question: question! }
   })
@@ -46,7 +48,7 @@ export async function listQuestions(tenantId: string, surveyId: string): Promise
 export async function updateQuestion(
   tenantId: string,
   id: string,
-  data: { text?: string; answerType?: QuestionRow['answerType']; pointValue?: number; isCritical?: boolean },
+  data: { text?: string; answerType?: QuestionRow['answerType']; pointValue?: number; scoredMinValue?: number | null; scoredMaxValue?: number | null; isCritical?: boolean },
 ): Promise<{ question: QuestionRow } | { error: 'not_found' }> {
   return withTenant(tenantId, async (tx) => {
     const [updated] = await tx

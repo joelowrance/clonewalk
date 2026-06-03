@@ -124,6 +124,67 @@ test.describe.serial('Question CRUD in survey builder', () => {
     await expect(page.getByText('No questions yet')).toBeVisible()
   })
 
+  test('selecting Scored answer type reveals min/max inputs; other types hide them', async ({ page }) => {
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.click('button:has-text("Add question")')
+    await expect(page.getByTestId('scored-min-input')).not.toBeVisible()
+    await expect(page.getByTestId('scored-max-input')).not.toBeVisible()
+
+    await page.selectOption('[data-testid="answer-type-select"]', 'scored')
+    await expect(page.getByTestId('scored-min-input')).toBeVisible()
+    await expect(page.getByTestId('scored-max-input')).toBeVisible()
+
+    await page.selectOption('[data-testid="answer-type-select"]', 'true_false')
+    await expect(page.getByTestId('scored-min-input')).not.toBeVisible()
+    await expect(page.getByTestId('scored-max-input')).not.toBeVisible()
+  })
+
+  test('admin can add a scored question with min/max range', async ({ page }) => {
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.click('button:has-text("Add question")')
+    await page.fill('[data-testid="question-text-input"]', 'Rate the cleanliness')
+    await page.selectOption('[data-testid="answer-type-select"]', 'scored')
+    await page.fill('[data-testid="point-value-input"]', '10')
+    await page.fill('[data-testid="scored-min-input"]', '0')
+    await page.fill('[data-testid="scored-max-input"]', '5')
+    await page.click('button:has-text("Save")')
+
+    const row = page.locator('[data-testid="question-row"]').first()
+    await expect(row).toContainText('Rate the cleanliness')
+    await expect(row).toContainText('Scored')
+    await expect(row).toContainText('0–5')
+  })
+
+  test('editing a scored question prefills existing min/max in the modal', async ({ page }) => {
+    await db.insert(schema.questions).values({
+      tenantId: E2E_TENANT_ID,
+      surveyId: E2E_SURVEY_ID,
+      text: 'Rate the facility',
+      answerType: 'scored',
+      pointValue: 20,
+      scoredMinValue: 1,
+      scoredMaxValue: 100,
+      isCritical: false,
+      position: 1,
+    })
+
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.locator('[data-testid="question-row"]').first().getByRole('button', { name: 'Edit' }).click()
+    await expect(page.getByTestId('scored-min-input')).toHaveValue('1')
+    await expect(page.getByTestId('scored-max-input')).toHaveValue('100')
+
+    await page.fill('[data-testid="scored-max-input"]', '50')
+    await page.click('button:has-text("Save")')
+
+    await expect(page.locator('[data-testid="question-row"]').first()).toContainText('1–50')
+  })
+
   test('reordering via drag-and-drop persists on page refresh', async ({ page }) => {
     await db.insert(schema.questions).values([
       { tenantId: E2E_TENANT_ID, surveyId: E2E_SURVEY_ID, text: 'First question', answerType: 'true_false', pointValue: 0, isCritical: false, position: 1 },
