@@ -62,6 +62,7 @@ test.describe.serial('Question CRUD in survey builder', () => {
     await expect(row).toContainText('True/False')
     await expect(row).toContainText('10')
     await expect(row).toContainText('Critical')
+    await expect(page.getByTestId('question-range').first()).toContainText('—')
   })
 
   test('admin can add a new question', async ({ page }) => {

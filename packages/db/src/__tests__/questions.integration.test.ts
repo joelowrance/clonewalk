@@ -55,6 +55,22 @@ describe('createQuestion', () => {
     expect(second.question.position).toBe(2)
   })
 
+  it('persists scoredMinValue and scoredMaxValue for a scored question', async () => {
+    const result = await createQuestion(TENANT_ID, {
+      surveyId: SURVEY_ID,
+      text: 'Rate cleanliness',
+      answerType: 'scored',
+      pointValue: 10,
+      isCritical: false,
+      scoredMinValue: 0,
+      scoredMaxValue: 5,
+    })
+    expect('question' in result).toBe(true)
+    if (!('question' in result)) return
+    expect(result.question.scoredMinValue).toBe(0)
+    expect(result.question.scoredMaxValue).toBe(5)
+  })
+
   it('returns survey_not_found for an unknown surveyId', async () => {
     const result = await createQuestion(TENANT_ID, {
       surveyId: 'bb000000-0000-0000-0000-000000009999',
@@ -109,6 +125,55 @@ describe('updateQuestion', () => {
     expect(result.question.answerType).toBe('scored')
     expect(result.question.pointValue).toBe(10)
     expect(result.question.isCritical).toBe(true)
+  })
+
+  it('updates scored range values on a question', async () => {
+    const created = await createQuestion(TENANT_ID, {
+      surveyId: SURVEY_ID,
+      text: 'Rate it',
+      answerType: 'scored',
+      pointValue: 10,
+      isCritical: false,
+      scoredMinValue: 0,
+      scoredMaxValue: 10,
+    })
+    expect('question' in created).toBe(true)
+    if (!('question' in created)) return
+
+    const result = await updateQuestion(TENANT_ID, created.question.id, {
+      scoredMinValue: 1,
+      scoredMaxValue: 100,
+    })
+
+    expect('question' in result).toBe(true)
+    if (!('question' in result)) return
+    expect(result.question.scoredMinValue).toBe(1)
+    expect(result.question.scoredMaxValue).toBe(100)
+  })
+
+  it('clears scored range when updated to null', async () => {
+    const created = await createQuestion(TENANT_ID, {
+      surveyId: SURVEY_ID,
+      text: 'Rate it',
+      answerType: 'scored',
+      pointValue: 10,
+      isCritical: false,
+      scoredMinValue: 0,
+      scoredMaxValue: 10,
+    })
+    expect('question' in created).toBe(true)
+    if (!('question' in created)) return
+
+    const result = await updateQuestion(TENANT_ID, created.question.id, {
+      answerType: 'true_false',
+      scoredMinValue: null,
+      scoredMaxValue: null,
+    })
+
+    expect('question' in result).toBe(true)
+    if (!('question' in result)) return
+    expect(result.question.scoredMinValue).toBeNull()
+    expect(result.question.scoredMaxValue).toBeNull()
   })
 
   it('returns not_found for an unknown question id', async () => {

@@ -36,6 +36,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ error: 'validation_error', fields: { answerType: 'invalid' } }, { status: 400 })
     }
     data.answerType = raw['answerType'] as QuestionRow['answerType']
+    if (data.answerType !== 'scored' && raw['scoredMinValue'] === undefined && raw['scoredMaxValue'] === undefined) {
+      data.scoredMinValue = null
+      data.scoredMaxValue = null
+    }
   }
   if (raw['pointValue'] !== undefined) {
     if (typeof raw['pointValue'] !== 'number') {
