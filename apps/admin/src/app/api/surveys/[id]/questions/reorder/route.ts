@@ -10,7 +10,7 @@ async function guard(req: Request) {
   return { ctx, res: null }
 }
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { ctx, res } = await guard(req)
   if (!ctx) return res!
   const { id } = await params

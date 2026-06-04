@@ -39,6 +39,12 @@ interface Question {
   position:        number
 }
 
+interface OptionDraft {
+  id?:        string
+  label:      string
+  pointValue: string
+}
+
 interface FormState {
   text:            string
   answerType:      AnswerType
@@ -46,9 +52,10 @@ interface FormState {
   scoredMinValue:  string
   scoredMaxValue:  string
   isCritical:      boolean
+  options:         OptionDraft[]
 }
 
-const EMPTY_FORM: FormState = { text: '', answerType: 'true_false', pointValue: '0', scoredMinValue: '0', scoredMaxValue: '10', isCritical: false }
+const EMPTY_FORM: FormState = { text: '', answerType: 'true_false', pointValue: '0', scoredMinValue: '0', scoredMaxValue: '10', isCritical: false, options: [] }
 
 function SortableRow({
   question,
@@ -201,6 +208,76 @@ function QuestionFormModal({
           </>
         )}
 
+        {form.answerType === 'multiple_choice' && (
+          <div className={styles.optionsSection}>
+            <div className={styles.optionsSectionHeader}>
+              <span className={styles.label}>Options</span>
+              <button
+                type="button"
+                className={styles.addOptionBtn}
+                onClick={() => set('options', [...form.options, { label: '', pointValue: '0' }])}
+                disabled={saving}
+              >
+                + Add option
+              </button>
+            </div>
+            {form.options.length === 0 && (
+              <p className={styles.optionsHint}>Add at least 2 options</p>
+            )}
+            {form.options.map((opt, i) => (
+              <div key={i} className={styles.optionRow}>
+                <input
+                  className={styles.optionLabelInput}
+                  placeholder="Label"
+                  value={opt.label}
+                  onChange={e => set('options', form.options.map((o, j) => j === i ? { ...o, label: e.target.value } : o))}
+                  disabled={saving}
+                  aria-label={`Option ${i + 1} label`}
+                />
+                <input
+                  type="number"
+                  min={0}
+                  className={styles.optionPointsInput}
+                  placeholder="Pts"
+                  value={opt.pointValue}
+                  onChange={e => set('options', form.options.map((o, j) => j === i ? { ...o, pointValue: e.target.value } : o))}
+                  disabled={saving}
+                  aria-label={`Option ${i + 1} point value`}
+                />
+                <button
+                  type="button"
+                  className={styles.optionMoveBtn}
+                  onClick={() => {
+                    const next = [...form.options]
+                    ;[next[i - 1]!, next[i]!] = [next[i]!, next[i - 1]!]
+                    set('options', next)
+                  }}
+                  disabled={saving || i === 0}
+                  aria-label="Move up"
+                >↑</button>
+                <button
+                  type="button"
+                  className={styles.optionMoveBtn}
+                  onClick={() => {
+                    const next = [...form.options]
+                    ;[next[i + 1]!, next[i]!] = [next[i]!, next[i + 1]!]
+                    set('options', next)
+                  }}
+                  disabled={saving || i === form.options.length - 1}
+                  aria-label="Move down"
+                >↓</button>
+                <button
+                  type="button"
+                  className={styles.optionDeleteBtn}
+                  onClick={() => set('options', form.options.filter((_, j) => j !== i))}
+                  disabled={saving}
+                  aria-label="Remove option"
+                >✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className={styles.checkRow}>
           <input
             id="q-critical"
@@ -260,6 +337,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
   const [loading, setLoading]     = useState(true)
   const [addOpen, setAddOpen]     = useState(false)
   const [editTarget, setEditTarget] = useState<Question | null>(null)
+  const [editInitialOptions, setEditInitialOptions] = useState<OptionDraft[]>([])
   const [deleteTarget, setDeleteTarget] = useState<Question | null>(null)
   const [saving, setSaving]       = useState(false)
   const [deleting, setDeleting]   = useState(false)
@@ -278,8 +356,30 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
 
   useEffect(() => { void load() }, [load])
 
+  function handleEditClick(q: Question) {
+    setFormError(null)
+    if (q.answerType !== 'multiple_choice') {
+      setEditInitialOptions([])
+      setEditTarget(q)
+      return
+    }
+    void (async () => {
+      const res = await fetch(`/api/questions/${q.id}/options`)
+      const opts: OptionDraft[] = res.ok
+        ? ((await res.json() as { options: { id: string; label: string; pointValue: number }[] }).options
+            .map(o => ({ id: o.id, label: o.label, pointValue: String(o.pointValue) })))
+        : []
+      setEditInitialOptions(opts)
+      setEditTarget(q)
+    })()
+  }
+
   async function handleAdd(form: FormState) {
     if (!form.text.trim()) { setFormError('Question text is required'); return }
+    if (form.answerType === 'multiple_choice' && form.options.length < 2) {
+      setFormError('Multiple choice questions require at least 2 options')
+      return
+    }
     setSaving(true)
     setFormError(null)
     const body: Record<string, unknown> = {
@@ -297,19 +397,33 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     })
-    setSaving(false)
-    if (res.ok) {
-      const body = await res.json() as { question: Question }
-      setQuestions(prev => [...prev, body.question])
-      setAddOpen(false)
-    } else {
+    if (!res.ok) {
+      setSaving(false)
       setFormError('Failed to save question')
+      return
     }
+    const data = await res.json() as { question: Question }
+    if (form.answerType === 'multiple_choice') {
+      for (const opt of form.options) {
+        await fetch(`/api/questions/${data.question.id}/options`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ label: opt.label, pointValue: parseInt(opt.pointValue, 10) || 0 }),
+        })
+      }
+    }
+    setSaving(false)
+    setQuestions(prev => [...prev, data.question])
+    setAddOpen(false)
   }
 
   async function handleEdit(form: FormState) {
     if (!editTarget) return
     if (!form.text.trim()) { setFormError('Question text is required'); return }
+    if (form.answerType === 'multiple_choice' && form.options.length < 2) {
+      setFormError('Multiple choice questions require at least 2 options')
+      return
+    }
     setSaving(true)
     setFormError(null)
     const body: Record<string, unknown> = {
@@ -327,14 +441,32 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     })
-    setSaving(false)
-    if (res.ok) {
-      const body = await res.json() as { question: Question }
-      setQuestions(prev => prev.map(q => q.id === body.question.id ? body.question : q))
-      setEditTarget(null)
-    } else {
+    if (!res.ok) {
+      setSaving(false)
       setFormError('Failed to save question')
+      return
     }
+    const data = await res.json() as { question: Question }
+
+    if (form.answerType === 'multiple_choice') {
+      // Delete all original options, then recreate in current form order
+      for (const orig of editInitialOptions) {
+        if (orig.id) {
+          await fetch(`/api/question-options/${orig.id}`, { method: 'DELETE' })
+        }
+      }
+      for (const opt of form.options) {
+        await fetch(`/api/questions/${editTarget.id}/options`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ label: opt.label, pointValue: parseInt(opt.pointValue, 10) || 0 }),
+        })
+      }
+    }
+
+    setSaving(false)
+    setQuestions(prev => prev.map(q => q.id === data.question.id ? data.question : q))
+    setEditTarget(null)
   }
 
   async function handleDelete() {
@@ -358,7 +490,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     setQuestions(reordered)
 
     await fetch(`/api/surveys/${surveyId}/questions/reorder`, {
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ orderedIds: reordered.map(q => q.id) }),
     })
@@ -397,7 +529,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
                   <SortableRow
                     key={q.id}
                     question={q}
-                    onEdit={q => { setEditTarget(q); setFormError(null) }}
+                    onEdit={handleEditClick}
                     onDelete={q => setDeleteTarget(q)}
                   />
                 ))}
@@ -421,7 +553,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       {editTarget && (
         <QuestionFormModal
           title="Edit question"
-          initial={{ text: editTarget.text, answerType: editTarget.answerType, pointValue: String(editTarget.pointValue), scoredMinValue: String(editTarget.scoredMinValue ?? 0), scoredMaxValue: String(editTarget.scoredMaxValue ?? 10), isCritical: editTarget.isCritical }}
+          initial={{ text: editTarget.text, answerType: editTarget.answerType, pointValue: String(editTarget.pointValue), scoredMinValue: String(editTarget.scoredMinValue ?? 0), scoredMaxValue: String(editTarget.scoredMaxValue ?? 10), isCritical: editTarget.isCritical, options: editInitialOptions }}
           onSave={handleEdit}
           onCancel={() => setEditTarget(null)}
           saving={saving}

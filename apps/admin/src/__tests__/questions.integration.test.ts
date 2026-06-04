@@ -282,10 +282,10 @@ describe('DELETE /api/surveys/[id]/questions/[questionId]', () => {
   })
 })
 
-describe('POST /api/surveys/[id]/questions/reorder', () => {
+describe('PATCH /api/surveys/[id]/questions/reorder', () => {
   it('reorders questions and returns 200', async () => {
     const { POST } = await import('../app/api/surveys/[id]/questions/route')
-    const { POST: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
+    const { PATCH: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
     const sid = await getSessionId('admin@qtest.com', PASSWORD)
 
     const r1 = await POST(surveyReq('POST', sid, SURVEY_ID, '', { text: 'A', answerType: 'true_false', pointValue: 0, isCritical: false }), { params: Promise.resolve({ id: SURVEY_ID }) })
@@ -294,27 +294,27 @@ describe('POST /api/surveys/[id]/questions/reorder', () => {
     const { question: qb } = await r2.json() as { question: { id: string } }
 
     const res = await REORDER(
-      surveyReq('POST', sid, SURVEY_ID, '/reorder', { orderedIds: [qb.id, qa.id] }),
+      surveyReq('PATCH', sid, SURVEY_ID, '/reorder', { orderedIds: [qb.id, qa.id] }),
       { params: Promise.resolve({ id: SURVEY_ID }) },
     )
     expect(res.status).toBe(200)
   })
 
   it('returns 400 for invalid ids', async () => {
-    const { POST: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
+    const { PATCH: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
     const sid = await getSessionId('admin@qtest.com', PASSWORD)
     const res = await REORDER(
-      surveyReq('POST', sid, SURVEY_ID, '/reorder', { orderedIds: ['00000000-0000-0000-0000-000000000000'] }),
+      surveyReq('PATCH', sid, SURVEY_ID, '/reorder', { orderedIds: ['00000000-0000-0000-0000-000000000000'] }),
       { params: Promise.resolve({ id: SURVEY_ID }) },
     )
     expect(res.status).toBe(400)
   })
 
   it('returns 400 when orderedIds is not an array', async () => {
-    const { POST: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
+    const { PATCH: REORDER } = await import('../app/api/surveys/[id]/questions/reorder/route')
     const sid = await getSessionId('admin@qtest.com', PASSWORD)
     const res = await REORDER(
-      surveyReq('POST', sid, SURVEY_ID, '/reorder', { orderedIds: 'not-an-array' }),
+      surveyReq('PATCH', sid, SURVEY_ID, '/reorder', { orderedIds: 'not-an-array' }),
       { params: Promise.resolve({ id: SURVEY_ID }) },
     )
     expect(res.status).toBe(400)

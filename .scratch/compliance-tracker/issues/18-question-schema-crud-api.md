@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 ## What to build
 
@@ -6,14 +6,14 @@ Create the `questions` table and its CRUD API. A Question belongs to a Survey an
 
 ## Acceptance criteria
 
-- [ ] `questions` table exists with id, survey_id, tenant_id, text, answer_type (enum), point_value, is_critical, position, and created_at; RLS applied
-- [ ] Answer type enum includes: true_false, scored, multiple_choice, photo, file
-- [ ] `GET /api/surveys/[id]/questions` returns Questions for a Survey ordered by position
-- [ ] `POST /api/surveys/[id]/questions` creates a Question
-- [ ] `PATCH /api/questions/[id]` updates a Question (text, answer type, point value, critical flag)
-- [ ] `DELETE /api/questions/[id]` deletes a Question
-- [ ] `PATCH /api/surveys/[id]/questions/reorder` accepts a new position array and reorders Questions
-- [ ] All endpoints protected by authentication and permission middleware
+- [x] `questions` table exists with id, survey_id, tenant_id, text, answer_type (enum), point_value, is_critical, position, and created_at; RLS applied
+- [x] Answer type enum includes: true_false, scored, multiple_choice, photo, file
+- [x] `GET /api/surveys/[id]/questions` returns Questions for a Survey ordered by position
+- [x] `POST /api/surveys/[id]/questions` creates a Question
+- [x] `PATCH /api/questions/[id]` updates a Question (text, answer type, point value, critical flag)
+- [x] `DELETE /api/questions/[id]` deletes a Question
+- [x] `PATCH /api/surveys/[id]/questions/reorder` accepts a new position array and reorders Questions
+- [x] All endpoints protected by authentication and permission middleware
 
 ## Blocked by
 
