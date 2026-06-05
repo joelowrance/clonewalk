@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -646,9 +646,8 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
               </thead>
               <tbody>
                 {questions.map(q => (
-                  <>
+                  <Fragment key={q.id}>
                     <SortableRow
-                      key={q.id}
                       question={q}
                       onEdit={handleEditClick}
                       onDelete={q => setDeleteTarget(q)}
@@ -674,7 +673,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
                         }}
                       />
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

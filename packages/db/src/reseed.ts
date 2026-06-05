@@ -8,6 +8,7 @@ const { db }    = await import('./client.js')
 const schema    = await import('./schema/index.js')
 
 // Delete in leaf-first order to respect FK constraints
+await db.delete(schema.branchRules)
 await db.delete(schema.questionOptions)
 await db.delete(schema.questions)
 await db.delete(schema.surveys)
@@ -49,7 +50,7 @@ await db.insert(schema.tenants)
   .values({ id: TENANT_ID, name: 'Demo Tenant' })
 
 await db.insert(schema.users)
-  .values({ id: USER_ID, tenantId: TENANT_ID, email: 'admin@demo.com', hashedPassword: HASHED_PW, status: 'active' })
+  .values({ id: USER_ID, tenantId: TENANT_ID, email: 'demo@admin.com', hashedPassword: HASHED_PW, status: 'active' })
 
 await db.insert(schema.roles)
   .values({ id: ROLE_ID, tenantId: TENANT_ID, name: 'Admin' })
@@ -73,5 +74,5 @@ await db.insert(schema.tenantIndustries).values(
   Object.values(INDUSTRY_IDS).map(industryId => ({ tenantId: TENANT_ID, industryId }))
 )
 
-console.log('Seeded: admin@demo.com / admin (4 industries)')
+console.log('Seeded: demo@admin.com / admin (4 industries)')
 process.exit(0)
