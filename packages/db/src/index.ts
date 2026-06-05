@@ -18,3 +18,5 @@ export { listQuestions, createQuestion, updateQuestion, deleteQuestion, reorderQ
 export type { QuestionRow, NestedQuestionRow } from './questions-queries'
 export { listQuestionOptions, createQuestionOption, updateQuestionOption, deleteQuestionOption, reorderQuestionOptions } from './question-options-queries'
 export type { QuestionOptionRow } from './question-options-queries'
+export { listBranchRules, createBranchRule, deleteBranchRule } from './branch-rules-queries'
+export type { BranchRuleRow } from './branch-rules-queries'
