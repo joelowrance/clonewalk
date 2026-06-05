@@ -186,6 +186,82 @@ test.describe.serial('Question CRUD in survey builder', () => {
     await expect(page.locator('[data-testid="question-row"]').first()).toContainText('1–50')
   })
 
+  test('"Add child" button appears on each top-level question row', async ({ page }) => {
+    await db.insert(schema.questions).values({
+      tenantId: E2E_TENANT_ID,
+      surveyId: E2E_SURVEY_ID,
+      text: 'Parent question',
+      answerType: 'true_false',
+      pointValue: 0,
+      isCritical: false,
+      position: 1,
+    })
+
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await expect(page.getByTestId('add-child-btn').first()).toBeVisible()
+  })
+
+  test('admin can add a child question that appears indented below its parent', async ({ page }) => {
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.click('button:has-text("Add question")')
+    await page.fill('[data-testid="question-text-input"]', 'Parent question')
+    await page.click('button:has-text("Save")')
+    await expect(page.locator('[data-testid="question-row"]')).toHaveCount(1)
+
+    await page.getByTestId('add-child-btn').click()
+    await expect(page.getByRole('dialog')).toContainText('Add child question')
+    await page.fill('[data-testid="question-text-input"]', 'Child question')
+    await page.click('button:has-text("Save")')
+
+    await expect(page.locator('[data-testid="child-question-row"]')).toHaveCount(1)
+    await expect(page.locator('[data-testid="child-question-row"]').first()).toContainText('Child question')
+  })
+
+  test('admin can reorder child questions with up/down buttons', async ({ page }) => {
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.click('button:has-text("Add question")')
+    await page.fill('[data-testid="question-text-input"]', 'Parent')
+    await page.click('button:has-text("Save")')
+
+    await page.getByTestId('add-child-btn').click()
+    await page.fill('[data-testid="question-text-input"]', 'Alpha')
+    await page.click('button:has-text("Save")')
+
+    await page.getByTestId('add-child-btn').click()
+    await page.fill('[data-testid="question-text-input"]', 'Beta')
+    await page.click('button:has-text("Save")')
+
+    const childRows = page.locator('[data-testid="child-question-row"]')
+    await expect(childRows).toHaveCount(2)
+    await expect(childRows.first()).toContainText('Alpha')
+
+    await childRows.first().getByRole('button', { name: 'Move down' }).click()
+    await expect(childRows.first()).toContainText('Beta')
+    await expect(childRows.nth(1)).toContainText('Alpha')
+  })
+
+  test('deleting a parent with children shows cascade warning', async ({ page }) => {
+    await login(page)
+    await page.goto(`/surveys/${E2E_SURVEY_ID}`)
+
+    await page.click('button:has-text("Add question")')
+    await page.fill('[data-testid="question-text-input"]', 'Parent')
+    await page.click('button:has-text("Save")')
+
+    await page.getByTestId('add-child-btn').click()
+    await page.fill('[data-testid="question-text-input"]', 'Child')
+    await page.click('button:has-text("Save")')
+
+    await page.locator('[data-testid="question-row"]').first().getByRole('button', { name: 'Delete' }).click()
+    await expect(page.getByRole('dialog')).toContainText('also delete 1 child question')
+  })
+
   test('reordering via drag-and-drop persists on page refresh', async ({ page }) => {
     await db.insert(schema.questions).values([
       { tenantId: E2E_TENANT_ID, surveyId: E2E_SURVEY_ID, text: 'First question', answerType: 'true_false', pointValue: 0, isCritical: false, position: 1 },

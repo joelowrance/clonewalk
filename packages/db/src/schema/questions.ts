@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, boolean, timestamp, pgEnum, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { tenants } from './tenants'
 import { surveys } from './surveys'
 
@@ -16,7 +16,8 @@ export const questions = pgTable('questions', {
   // Scored questions only. Formula: (entered_value - min) / (max - min) * point_value
   scoredMinValue:  integer('scored_min_value'),
   scoredMaxValue:  integer('scored_max_value'),
-  isCritical:      boolean('is_critical').notNull().default(false),
+  isCritical:          boolean('is_critical').notNull().default(false),
+  parentQuestionId:    uuid('parent_question_id').references((): AnyPgColumn => questions.id, { onDelete: 'cascade' }),
   position:    integer('position').notNull().default(0),
   createdAt:   timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })

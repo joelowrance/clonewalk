@@ -29,14 +29,19 @@ const ANSWER_TYPE_LABELS: Record<AnswerType, string> = {
 }
 
 interface Question {
-  id:              string
-  text:            string
-  answerType:      AnswerType
-  pointValue:      number
-  scoredMinValue:  number | null
-  scoredMaxValue:  number | null
-  isCritical:      boolean
-  position:        number
+  id:               string
+  text:             string
+  answerType:       AnswerType
+  pointValue:       number
+  scoredMinValue:   number | null
+  scoredMaxValue:   number | null
+  isCritical:       boolean
+  parentQuestionId: string | null
+  position:         number
+}
+
+interface NestedQuestion extends Question {
+  children: Question[]
 }
 
 interface OptionDraft {
@@ -61,10 +66,12 @@ function SortableRow({
   question,
   onEdit,
   onDelete,
+  onAddChild,
 }: {
-  question: Question
-  onEdit:   (q: Question) => void
-  onDelete: (q: Question) => void
+  question:    NestedQuestion
+  onEdit:      (q: Question) => void
+  onDelete:    (q: Question) => void
+  onAddChild:  (parentId: string) => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: question.id })
 
@@ -105,6 +112,65 @@ function SortableRow({
       <td className={styles.actionsCell}>
         <button className={styles.editBtn} onClick={() => onEdit(question)} type="button">Edit</button>
         <button className={styles.deleteBtn} onClick={() => onDelete(question)} type="button">Delete</button>
+        <button
+          className={styles.addChildBtn}
+          onClick={() => onAddChild(question.id)}
+          type="button"
+          data-testid="add-child-btn"
+        >
+          Add child
+        </button>
+      </td>
+    </tr>
+  )
+}
+
+function ChildRow({
+  child,
+  index,
+  siblingCount,
+  onEdit,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+}: {
+  child:       Question
+  index:       number
+  siblingCount: number
+  onEdit:      (q: Question) => void
+  onDelete:    (q: Question) => void
+  onMoveUp:    () => void
+  onMoveDown:  () => void
+}) {
+  return (
+    <tr className={styles.row} data-testid="child-question-row">
+      <td className={styles.handleCell} />
+      <td className={styles.childTextCell}>{child.text}</td>
+      <td className={styles.cell}>{ANSWER_TYPE_LABELS[child.answerType]}</td>
+      <td className={styles.cell}>{child.pointValue}</td>
+      <td className={styles.cell} data-testid="question-range">
+        {child.answerType === 'scored' && child.scoredMinValue !== null && child.scoredMaxValue !== null
+          ? `${child.scoredMinValue}–${child.scoredMaxValue}`
+          : '—'}
+      </td>
+      <td className={styles.cell}>{child.isCritical ? 'Critical' : '—'}</td>
+      <td className={styles.actionsCell}>
+        <button className={styles.editBtn} onClick={() => onEdit(child)} type="button">Edit</button>
+        <button className={styles.deleteBtn} onClick={() => onDelete(child)} type="button">Delete</button>
+        <button
+          className={styles.moveBtn}
+          onClick={onMoveUp}
+          disabled={index === 0}
+          type="button"
+          aria-label="Move up"
+        >↑</button>
+        <button
+          className={styles.moveBtn}
+          onClick={onMoveDown}
+          disabled={index === siblingCount - 1}
+          type="button"
+          aria-label="Move down"
+        >↓</button>
       </td>
     </tr>
   )
@@ -305,14 +371,16 @@ function QuestionFormModal({
 
 function DeleteConfirmDialog({
   question,
+  childCount,
   onConfirm,
   onCancel,
   deleting,
 }: {
-  question: Question
-  onConfirm: () => void
-  onCancel:  () => void
-  deleting:  boolean
+  question:   Question
+  childCount: number
+  onConfirm:  () => void
+  onCancel:   () => void
+  deleting:   boolean
 }) {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true">
@@ -321,6 +389,11 @@ function DeleteConfirmDialog({
         <p className={styles.confirmText}>
           &ldquo;{question.text}&rdquo; will be permanently removed.
         </p>
+        {childCount > 0 && (
+          <p className={styles.confirmText}>
+            This will also delete {childCount} child question{childCount === 1 ? '' : 's'}.
+          </p>
+        )}
         <div className={styles.modalActions}>
           <button className={styles.cancel} onClick={onCancel} disabled={deleting} type="button">Cancel</button>
           <button className={styles.deleteConfirm} onClick={onConfirm} disabled={deleting} type="button">
@@ -333,22 +406,23 @@ function DeleteConfirmDialog({
 }
 
 export function QuestionList({ surveyId }: { surveyId: string }) {
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [addOpen, setAddOpen]     = useState(false)
+  const [questions, setQuestions] = useState<NestedQuestion[]>([])
+  const [loading, setLoading]       = useState(true)
+  const [addOpen, setAddOpen]       = useState(false)
+  const [pendingParentId, setPendingParentId] = useState<string | null>(null)
   const [editTarget, setEditTarget] = useState<Question | null>(null)
   const [editInitialOptions, setEditInitialOptions] = useState<OptionDraft[]>([])
   const [deleteTarget, setDeleteTarget] = useState<Question | null>(null)
-  const [saving, setSaving]       = useState(false)
-  const [deleting, setDeleting]   = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
+  const [saving, setSaving]         = useState(false)
+  const [deleting, setDeleting]     = useState(false)
+  const [formError, setFormError]   = useState<string | null>(null)
 
   const sensors = useSensors(useSensor(PointerSensor))
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/surveys/${surveyId}/questions`)
     if (res.ok) {
-      const body = await res.json() as { questions: Question[] }
+      const body = await res.json() as { questions: NestedQuestion[] }
       setQuestions(body.questions)
     }
     setLoading(false)
@@ -374,6 +448,12 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     })()
   }
 
+  function handleAddChild(parentId: string) {
+    setPendingParentId(parentId)
+    setAddOpen(true)
+    setFormError(null)
+  }
+
   async function handleAdd(form: FormState) {
     if (!form.text.trim()) { setFormError('Question text is required'); return }
     if (form.answerType === 'multiple_choice' && form.options.length < 2) {
@@ -391,6 +471,9 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     if (form.answerType === 'scored') {
       body['scoredMinValue'] = parseInt(form.scoredMinValue, 10)
       body['scoredMaxValue'] = parseInt(form.scoredMaxValue, 10)
+    }
+    if (pendingParentId) {
+      body['parentQuestionId'] = pendingParentId
     }
     const res = await fetch(`/api/surveys/${surveyId}/questions`, {
       method: 'POST',
@@ -413,7 +496,14 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       }
     }
     setSaving(false)
-    setQuestions(prev => [...prev, data.question])
+    if (pendingParentId) {
+      setQuestions(prev => prev.map(q =>
+        q.id === pendingParentId ? { ...q, children: [...q.children, data.question] } : q
+      ))
+      setPendingParentId(null)
+    } else {
+      setQuestions(prev => [...prev, { ...data.question, children: [] }])
+    }
     setAddOpen(false)
   }
 
@@ -449,7 +539,6 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     const data = await res.json() as { question: Question }
 
     if (form.answerType === 'multiple_choice') {
-      // Delete all original options, then recreate in current form order
       for (const orig of editInitialOptions) {
         if (orig.id) {
           await fetch(`/api/question-options/${orig.id}`, { method: 'DELETE' })
@@ -465,7 +554,13 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     }
 
     setSaving(false)
-    setQuestions(prev => prev.map(q => q.id === data.question.id ? data.question : q))
+    setQuestions(prev => prev.map(q => {
+      if (data.question.parentQuestionId && q.id === data.question.parentQuestionId) {
+        return { ...q, children: q.children.map(c => c.id === data.question.id ? data.question : c) }
+      }
+      if (q.id === data.question.id) return { ...q, ...data.question }
+      return q
+    }))
     setEditTarget(null)
   }
 
@@ -475,9 +570,30 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
     const res = await fetch(`/api/surveys/${surveyId}/questions/${deleteTarget.id}`, { method: 'DELETE' })
     setDeleting(false)
     if (res.ok) {
-      setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
+      if (deleteTarget.parentQuestionId) {
+        setQuestions(prev => prev.map(q =>
+          q.id === deleteTarget.parentQuestionId
+            ? { ...q, children: q.children.filter(c => c.id !== deleteTarget.id) }
+            : q
+        ))
+      } else {
+        setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
+      }
       setDeleteTarget(null)
     }
+  }
+
+  async function handleChildReorder(parentId: string, siblingIds: string[]) {
+    await fetch(`/api/surveys/${surveyId}/questions/reorder`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ orderedIds: siblingIds }),
+    })
+    setQuestions(prev => prev.map(q => {
+      if (q.id !== parentId) return q
+      const reordered = siblingIds.map(id => q.children.find(c => c.id === id)!)
+      return { ...q, children: reordered }
+    }))
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -495,6 +611,10 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       body: JSON.stringify({ orderedIds: reordered.map(q => q.id) }),
     })
   }
+
+  const deleteTargetChildCount = deleteTarget && !deleteTarget.parentQuestionId
+    ? (questions.find(q => q.id === deleteTarget.id)?.children.length ?? 0)
+    : 0
 
   if (loading) return <p>Loading questions…</p>
 
@@ -526,12 +646,35 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
               </thead>
               <tbody>
                 {questions.map(q => (
-                  <SortableRow
-                    key={q.id}
-                    question={q}
-                    onEdit={handleEditClick}
-                    onDelete={q => setDeleteTarget(q)}
-                  />
+                  <>
+                    <SortableRow
+                      key={q.id}
+                      question={q}
+                      onEdit={handleEditClick}
+                      onDelete={q => setDeleteTarget(q)}
+                      onAddChild={handleAddChild}
+                    />
+                    {q.children.map((child, i) => (
+                      <ChildRow
+                        key={child.id}
+                        child={child}
+                        index={i}
+                        siblingCount={q.children.length}
+                        onEdit={handleEditClick}
+                        onDelete={c => setDeleteTarget(c)}
+                        onMoveUp={() => {
+                          const newOrder = [...q.children.map(c => c.id)]
+                          ;[newOrder[i - 1]!, newOrder[i]!] = [newOrder[i]!, newOrder[i - 1]!]
+                          void handleChildReorder(q.id, newOrder)
+                        }}
+                        onMoveDown={() => {
+                          const newOrder = [...q.children.map(c => c.id)]
+                          ;[newOrder[i + 1]!, newOrder[i]!] = [newOrder[i]!, newOrder[i + 1]!]
+                          void handleChildReorder(q.id, newOrder)
+                        }}
+                      />
+                    ))}
+                  </>
                 ))}
               </tbody>
             </table>
@@ -541,10 +684,10 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
 
       {addOpen && (
         <QuestionFormModal
-          title="Add question"
+          title={pendingParentId ? 'Add child question' : 'Add question'}
           initial={EMPTY_FORM}
           onSave={handleAdd}
-          onCancel={() => setAddOpen(false)}
+          onCancel={() => { setAddOpen(false); setPendingParentId(null) }}
           saving={saving}
           error={formError}
         />
@@ -564,6 +707,7 @@ export function QuestionList({ surveyId }: { surveyId: string }) {
       {deleteTarget && (
         <DeleteConfirmDialog
           question={deleteTarget}
+          childCount={deleteTargetChildCount}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           deleting={deleting}

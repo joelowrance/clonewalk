@@ -72,7 +72,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   return NextResponse.json({ question: {
     id: q.id, surveyId: q.surveyId, text: q.text, answerType: q.answerType,
     pointValue: q.pointValue, scoredMinValue: q.scoredMinValue, scoredMaxValue: q.scoredMaxValue,
-    isCritical: q.isCritical, position: q.position,
+    isCritical: q.isCritical, parentQuestionId: q.parentQuestionId, position: q.position,
     createdAt: q.createdAt.toISOString(),
   }})
 }

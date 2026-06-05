@@ -55,6 +55,30 @@ describe('createQuestion', () => {
     expect(second.question.position).toBe(2)
   })
 
+  it('stores parentQuestionId when creating a child question', async () => {
+    const parent = await createQuestion(TENANT_ID, {
+      surveyId: SURVEY_ID,
+      text: 'Parent question',
+      answerType: 'true_false',
+      pointValue: 0,
+      isCritical: false,
+    })
+    expect('question' in parent).toBe(true)
+    if (!('question' in parent)) return
+
+    const child = await createQuestion(TENANT_ID, {
+      surveyId: SURVEY_ID,
+      text: 'Child question',
+      answerType: 'true_false',
+      pointValue: 0,
+      isCritical: false,
+      parentQuestionId: parent.question.id,
+    })
+    expect('question' in child).toBe(true)
+    if (!('question' in child)) return
+    expect(child.question.parentQuestionId).toBe(parent.question.id)
+  })
+
   it('persists scoredMinValue and scoredMaxValue for a scored question', async () => {
     const result = await createQuestion(TENANT_ID, {
       surveyId: SURVEY_ID,
@@ -69,6 +93,33 @@ describe('createQuestion', () => {
     if (!('question' in result)) return
     expect(result.question.scoredMinValue).toBe(0)
     expect(result.question.scoredMaxValue).toBe(5)
+  })
+
+  it('scopes child positions within their parent (not globally)', async () => {
+    const p1 = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent 1', answerType: 'true_false', pointValue: 0, isCritical: false })
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent 2', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in p1).toBe(true)
+    if (!('question' in p1)) return
+    // top-level positions: 1, 2 — children should restart at 1, not continue from 3
+    const c1 = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child 1', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: p1.question.id })
+    const c2 = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child 2', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: p1.question.id })
+    expect('question' in c1 && 'question' in c2).toBe(true)
+    if (!('question' in c1) || !('question' in c2)) return
+    expect(c1.question.position).toBe(1)
+    expect(c2.question.position).toBe(2)
+  })
+
+  it('returns parent_is_child when attempting to create a grandchild', async () => {
+    const parent = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in parent).toBe(true)
+    if (!('question' in parent)) return
+
+    const child = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id })
+    expect('question' in child).toBe(true)
+    if (!('question' in child)) return
+
+    const grandchild = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Grandchild', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: child.question.id })
+    expect(grandchild).toEqual({ error: 'parent_is_child' })
   })
 
   it('returns survey_not_found for an unknown surveyId', async () => {
@@ -97,6 +148,45 @@ describe('listQuestions', () => {
     expect(result[0]!.text).toBe('First')
     expect(result[1]!.text).toBe('Second')
     expect(result[2]!.text).toBe('Third')
+  })
+
+  it('returns top-level questions with children nested inline', async () => {
+    const p1 = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent A', answerType: 'true_false', pointValue: 0, isCritical: false })
+    const p2 = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent B', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in p1 && 'question' in p2).toBe(true)
+    if (!('question' in p1) || !('question' in p2)) return
+
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child of A', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: p1.question.id })
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child of B', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: p2.question.id })
+
+    const result = await listQuestions(TENANT_ID, SURVEY_ID)
+    expect(result).toHaveLength(2)
+    expect(result[0]!.children).toHaveLength(1)
+    expect(result[0]!.children[0]!.text).toBe('Child of A')
+    expect(result[1]!.children).toHaveLength(1)
+    expect(result[1]!.children[0]!.parentQuestionId).toBe(p2.question.id)
+  })
+
+  it('orders children by position within their parent', async () => {
+    const parent = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in parent).toBe(true)
+    if (!('question' in parent)) return
+
+    await db.insert(questions).values([
+      { tenantId: TENANT_ID, surveyId: SURVEY_ID, text: 'Third', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id, position: 3 },
+      { tenantId: TENANT_ID, surveyId: SURVEY_ID, text: 'First',  answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id, position: 1 },
+      { tenantId: TENANT_ID, surveyId: SURVEY_ID, text: 'Second', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id, position: 2 },
+    ])
+
+    const result = await listQuestions(TENANT_ID, SURVEY_ID)
+    expect(result).toHaveLength(1)
+    expect(result[0]!.children.map(c => c.text)).toEqual(['First', 'Second', 'Third'])
+  })
+
+  it('returns empty children array for parentless questions', async () => {
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Lone question', answerType: 'true_false', pointValue: 0, isCritical: false })
+    const result = await listQuestions(TENANT_ID, SURVEY_ID)
+    expect(result[0]!.children).toEqual([])
   })
 })
 
@@ -205,6 +295,20 @@ describe('deleteQuestion', () => {
     const result = await deleteQuestion(TENANT_ID, 'bb000000-0000-0000-0000-000000009999')
     expect(result).toEqual({ error: 'not_found' })
   })
+
+  it('cascades to children when parent is deleted', async () => {
+    const parent = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in parent).toBe(true)
+    if (!('question' in parent)) return
+
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child 1', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id })
+    await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child 2', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id })
+
+    await deleteQuestion(TENANT_ID, parent.question.id)
+
+    const remaining = await listQuestions(TENANT_ID, SURVEY_ID)
+    expect(remaining).toHaveLength(0)
+  })
 })
 
 describe('reorderQuestions', () => {
@@ -229,6 +333,19 @@ describe('reorderQuestions', () => {
     if (!('question' in a)) return
 
     const result = await reorderQuestions(TENANT_ID, SURVEY_ID, [a.question.id, 'bb000000-0000-0000-0000-000000009999'])
+    expect(result).toEqual({ error: 'invalid_ids' })
+  })
+
+  it('returns invalid_ids when IDs span different parent contexts', async () => {
+    const parent = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false })
+    expect('question' in parent).toBe(true)
+    if (!('question' in parent)) return
+
+    const child = await createQuestion(TENANT_ID, { surveyId: SURVEY_ID, text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.question.id })
+    expect('question' in child).toBe(true)
+    if (!('question' in child)) return
+
+    const result = await reorderQuestions(TENANT_ID, SURVEY_ID, [parent.question.id, child.question.id])
     expect(result).toEqual({ error: 'invalid_ids' })
   })
 })

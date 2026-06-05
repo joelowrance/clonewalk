@@ -105,6 +105,41 @@ describe('GET /api/surveys/[id]/questions', () => {
     expect(body.questions[0]!.text).toBe('First')
     expect(body.questions[1]!.text).toBe('Second')
   })
+
+  it('returns questions with children nested inline', async () => {
+    const { GET, POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+
+    const parentRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: parent } = await parentRes.json() as { question: { id: string } }
+    await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.id }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+
+    const res = await GET(surveyReq('GET', sid, SURVEY_ID), { params: Promise.resolve({ id: SURVEY_ID }) })
+    expect(res.status).toBe(200)
+    const body = await res.json() as { questions: { text: string; children: { text: string; parentQuestionId: string }[] }[] }
+    expect(body.questions).toHaveLength(1)
+    expect(body.questions[0]!.children).toHaveLength(1)
+    expect(body.questions[0]!.children[0]!.text).toBe('Child')
+    expect(body.questions[0]!.children[0]!.parentQuestionId).toBe(parent.id)
+  })
+
+  it('returns empty children array for questions without children', async () => {
+    const { GET, POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Lone question', answerType: 'true_false', pointValue: 0, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const res = await GET(surveyReq('GET', sid, SURVEY_ID), { params: Promise.resolve({ id: SURVEY_ID }) })
+    const body = await res.json() as { questions: { children: unknown[] }[] }
+    expect(body.questions[0]!.children).toEqual([])
+  })
 })
 
 describe('POST /api/surveys/[id]/questions', () => {
@@ -232,6 +267,60 @@ describe('POST /api/surveys/[id]/questions', () => {
     const body = await res.json() as { question: { scoredMinValue: unknown; scoredMaxValue: unknown } }
     expect(body.question.scoredMinValue).toBeNull()
     expect(body.question.scoredMaxValue).toBeNull()
+  })
+
+  it('creates a child question with valid parentQuestionId', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const parentRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: parent } = await parentRes.json() as { question: { id: string } }
+
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.id }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(201)
+    const body = await res.json() as { question: { parentQuestionId: string } }
+    expect(body.question.parentQuestionId).toBe(parent.id)
+  })
+
+  it('returns 400 when parentQuestionId does not exist in the survey', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: '00000000-0000-0000-0000-000000000000' }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(400)
+    const body = await res.json() as { error: string; fields: Record<string, string> }
+    expect(body.error).toBe('validation_error')
+    expect(body.fields['parentQuestionId']).toBeDefined()
+  })
+
+  it('returns 400 when parentQuestionId points to a child (prevents grandchildren)', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const parentRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: parent } = await parentRes.json() as { question: { id: string } }
+    const childRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.id }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: child } = await childRes.json() as { question: { id: string } }
+
+    const res = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Grandchild', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: child.id }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    expect(res.status).toBe(400)
+    const body = await res.json() as { error: string; fields: Record<string, string> }
+    expect(body.fields['parentQuestionId']).toBeDefined()
   })
 })
 
@@ -376,6 +465,30 @@ describe('PATCH /api/surveys/[id]/questions/[questionId]', () => {
     expect(body.question.answerType).toBe('scored')
     expect(body.question.scoredMinValue).toBe(1)
     expect(body.question.scoredMaxValue).toBe(9)
+  })
+
+  it('PATCH response includes parentQuestionId for child questions', async () => {
+    const { POST } = await import('../app/api/surveys/[id]/questions/route')
+    const { PATCH } = await import('../app/api/surveys/[id]/questions/[questionId]/route')
+    const sid = await getSessionId('admin@qtest.com', PASSWORD)
+    const parentRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Parent', answerType: 'true_false', pointValue: 0, isCritical: false }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: parent } = await parentRes.json() as { question: { id: string } }
+    const childRes = await POST(
+      surveyReq('POST', sid, SURVEY_ID, '', { text: 'Child', answerType: 'true_false', pointValue: 0, isCritical: false, parentQuestionId: parent.id }),
+      { params: Promise.resolve({ id: SURVEY_ID }) },
+    )
+    const { question: child } = await childRes.json() as { question: { id: string } }
+
+    const res = await PATCH(
+      surveyReq('PATCH', sid, SURVEY_ID, `/${child.id}`, { text: 'Child updated' }),
+      { params: Promise.resolve({ id: SURVEY_ID, questionId: child.id }) },
+    )
+    expect(res.status).toBe(200)
+    const body = await res.json() as { question: { parentQuestionId: string } }
+    expect(body.question.parentQuestionId).toBe(parent.id)
   })
 })
 
